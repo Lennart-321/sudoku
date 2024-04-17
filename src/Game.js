@@ -3,8 +3,13 @@ import { CalcBoard } from "./CalcBoard";
 
 export class Game {
   board;
+  targetBoard;
+  targetStatus;
+  startTime;
+  solvedTime;
+  isSolved;
 
-  constructor(brd) {
+  constructor(brd, trg = null, trgStat = undefined) {
     // // prettier-ignore
     // this.board = brd ? brd : Calc.simpleCheatReduce([
     //   0xD00,0x1ff,0x1ff,0x1ff,0x1ff,0x1ff,0x1ff,0xC02,0xC80,
@@ -17,15 +22,18 @@ export class Game {
     //   0x1ff,0x1ff,0xC01,0xC02,0xC40,0x1ff,0x1ff,0x1ff,0x1ff,
     //   0xC80,0x1ff,0xC08,0x1ff,0x1ff,0x1ff,0x1ff,0x1ff,0xC20
     // ]);
-    this.board = brd ? brd : Calc.generateRandomBoard();
+    this.board = brd; // ? brd : Calc.generateRandomBoard();
     //this.board = brd ? brd : CalcBoard.generateNewGame();
+    this.targetBoard = trg;
+    this.targetStatus = trgStat !== undefined ? trgStat : trg ? 1 : 0;
+    this.isSolved = false;
+    this.startTime = new Date();
+    this.solvedTime = null;
   }
   copy() {
-    // const cpBoard = Array(this.board.length);
-    // for (var i = 0; i < this.board.length; i++) {
-    //   cpBoard[i] = this.board[i];
-    // }
-    // return new Game(cpBoard);
-    return new Game(Calc.copyBoard(this.board));
+    return new Game(Calc.copyBoard(this.board), this.targetBoard, this.targetStatus);
+  }
+  solutionType() {
+    return Calc.solutionType(this);
   }
 }

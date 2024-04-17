@@ -9,8 +9,8 @@ import { globalTest } from "./test.js";
 Calc.initClass();
 globalTest();
 const setSize = () => {
-  let winSize = Math.min(window.innerWidth, window.innerHeight - 50);
-  let fontSize = Math.floor(winSize / 70);
+  let winSize = Math.min(window.innerWidth, window.innerHeight);
+  let fontSize = Math.floor(winSize / 65);
   document.documentElement.style.setProperty("--fontSize", `${fontSize}px`);
 };
 setSize();

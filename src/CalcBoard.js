@@ -5,12 +5,14 @@ export class CalcBoard {
   board;
   solvedIxs;
   unsolvedIxs;
-  targetBoard;
   solvedN;
-  //solvedSquaresBits;
-  constructor(board, isWorkBord = false, targetBoard = null, solvedIxs = null, unsolvedIxs = null) {
+  targetBoard;
+  targetStatus; //0=Unknown, 1=Some solution, 3=Unique solution, 5=Not unique solution, 8=Not solvable, -1=ERROR
+
+  constructor(board, isWorkBord = false, targetBoard = null, targetStatus = 0, solvedIxs = null, unsolvedIxs = null) {
     this.board = Calc.copyBoard(board);
     this.targetBoard = targetBoard;
+    this.targetStatus = targetStatus;
     this.solvedIxs = solvedIxs;
     this.unsolvedIxs = unsolvedIxs;
     this.solvedN = null;
@@ -20,7 +22,7 @@ export class CalcBoard {
   }
 
   copy() {
-    return new CalcBoard(this.board, true, this.targetBoard);
+    return new CalcBoard(this.board, true, this.targetBoard, this.targetStatus);
   }
 
   transformToGame() {
@@ -29,7 +31,7 @@ export class CalcBoard {
       if (Calc.symbolCount(sq) === 1) gameBoard[ix] |= Calc.isFixedBit | Calc.isDeterminedBit;
       else gameBoard[ix] = Calc.symbolBits;
     });
-    return new Game(gameBoard);
+    return new Game(gameBoard, this.targetBoard, this.targetStatus);
   }
   updateGameBoard(game) {
     for (let ix = 0; ix < Calc.nrSquares; ix++) {
@@ -469,6 +471,59 @@ export class CalcBoard {
     return 0;
   }
 
+  solutionType() {
+    if (this.targetStatus > 1) {
+      return this.targetStatus;
+    }
+
+    let tmpBoard = this.copy();
+    if (tmpBoard.trySolve([], 9)) {
+      return (this.targetStatus = 3);
+    }
+
+    if (this.targetStatus === 0) {
+      const levelCount = [];
+      if (!tmpBoard.trySolve(levelCount)) {
+        return (this.targetStatus = 8);
+      }
+      this.targetBoard = tmpBoard.board;
+      if (levelCount[7] === 0) {
+        console.log("solutionType ERROR: levelCount[7] === 0");
+        return (this.targetStatus = 3);
+      }
+      this.targetStatus = 1;
+    }
+
+    const calcBoard = this.copy();
+    calcBoard.solvedN = Calc.deepCopy(this.solvedN);
+
+    for (let ix = 0; ix < Calc.nrSquares; ix++) {
+      const nrSym = Calc.symbolCount(calcBoard.board[ix]);
+      if (nrSym === 0) {
+        console.log("solutionType ERROR: Insolvable, NO OPTIONS");
+        return (this.targetStatus = -1);
+      }
+      if (nrSym > 1) {
+        for (let otherSym of Calc.getSymbols(calcBoard.board[ix])) {
+          if (otherSym === calcBoard.targetBoard[ix]) continue;
+          let tmpBoard = calcBoard.copy();
+          tmpBoard.solvedN = Calc.deepCopy(calcBoard.solvedN);
+          tmpBoard.board[ix] = otherSym;
+          if (tmpBoard.trySolve([])) {
+            return (this.targetStatus = 5);
+          }
+        }
+        calcBoard.board[ix] = calcBoard.targetBoard[ix];
+        if (calcBoard.trySolve([], 9)) {
+          return (this.targetStatus = 3);
+        }
+      }
+    }
+
+    console.log("solutionType ERROR: Bad finish");
+    return (this.targetStatus = -1);
+  }
+
   prepareTrialAndError() {
     if (Calc.getNSymbolSquares(this.board, 0).length > 0) {
       //ERROR: empty squares
@@ -500,7 +555,7 @@ export class CalcBoard {
     //solvedIxs.forEach((_, ix) => (solvedIxs[ix] = ix));
     for (var i = 0; i < solvedIxs.length; i++) solvedIxs[i] = i;
 
-    const cb = new CalcBoard(board, true, targetBoard, solvedIxs, []);
+    const cb = new CalcBoard(board, true, targetBoard, 3 /*Unique solution*/, solvedIxs, []);
     cb.removeManySolved(level);
 
     return cb.transformToGame();

@@ -1,4 +1,5 @@
 import { CalcBoard } from "./CalcBoard";
+import { Sudoku } from "./Sudoku";
 
 export class Calc {
   static initClass() {
@@ -35,6 +36,7 @@ export class Calc {
   //static showHelpsymolsBit = 0x200;
   static isFixedBit = 0x400;
   static isDeterminedBit = 0x800;
+  static isUserEditedBit = 0x1000;
   static nrSquares = 81;
   static nrSymbols = 9;
   static nrSymbolRoot = 3;
@@ -137,26 +139,32 @@ export class Calc {
   static isSelected(value) {
     return (value & (Calc.isFixedBit | Calc.isDeterminedBit)) === Calc.isDeterminedBit;
   }
+  static isUserEdited(value) {
+    return (value & Calc.isUserEditedBit) !== 0;
+  }
+  static symbols(value) {
+    return value & Calc.symbolBits;
+  }
   static symbolCount(value) {
     return Calc.bitCountArray_UsedBy_symbolCount[value & Calc.symbolBits];
   }
-  static squareCount = this.symbolCount;
+  static squareCount = Calc.symbolCount;
   static isReduced(value) {
-    return this.symbolCount(value) < Calc.nrSymbols;
+    return Calc.symbolCount(value) < Calc.nrSymbols;
   }
   static getSymbolBit(symbol) {
     return 1 << (symbol - 1);
   }
-  static symbolFromBit = this.firstBitNr;
+  static symbolFromBit = Calc.firstBitNr;
   static firstBitNr(bit) {
-    for (var bitNr = 1; bitNr <= this.nrSymbols; bitNr++, bit >>= 1) {
+    for (var bitNr = 1; bitNr <= Calc.nrSymbols; bitNr++, bit >>= 1) {
       if ((bit & 1) === 1) return bitNr;
     }
     return 0;
   }
   static getSymbols(symBits) {
     const syms = [];
-    for (var symBit = 1; symBit < this.symbolBits; symBit <<= 1) {
+    for (var symBit = 1; symBit < Calc.symbolBits; symBit <<= 1) {
       if ((symBits & symBit) !== 0) syms.push(symBit);
     }
     return syms;
@@ -164,10 +172,28 @@ export class Calc {
 
   static bitIxs(bits) {
     const res = [];
-    for (var bitIx = 0, bit = 1; bitIx < this.nrSymbols; bitIx++, bit <<= 1) {
+    for (var bitIx = 0, bit = 1; bitIx < Calc.nrSymbols; bitIx++, bit <<= 1) {
       if ((bits & bit) !== 0) res.push(bitIx);
     }
     return res;
+  }
+
+  static cleanBoard() {
+    return Array(Calc.nrSquares).fill(Calc.symbolBits);
+  }
+
+  static copyBoard(board) {
+    const cpBoard = Array(board.length);
+    for (var i = 0; i < board.length; i++) {
+      cpBoard[i] = board[i];
+    }
+    return cpBoard;
+  }
+
+  static copyFrom(from, to) {
+    for (var i = 0; i < from.length; i++) {
+      to[i] = from[i];
+    }
   }
 
   static firstCombination(n) {
@@ -256,13 +282,27 @@ export class Calc {
       }
     }
   }
-
-  static copyBoard(board) {
-    const cpBoard = Array(board.length);
-    for (var i = 0; i < board.length; i++) {
-      cpBoard[i] = board[i];
+  static isSolved(gameBoard) {
+    for (let gx of Calc.grpIx) {
+      let groupCombSymbols = 0;
+      for (let bix of gx) {
+        const val = gameBoard[bix];
+        if (!Calc.isDetermined(val) || Calc.symbolCount(val) !== 1) return false;
+        groupCombSymbols |= val;
+      }
+      if ((groupCombSymbols & Calc.symbolBits) !== Calc.symbolBits) return false;
     }
-    return cpBoard;
+    return true;
+  }
+
+  static solutionType(game) {
+    if (game.targetStatus > 1) return game.targetStatus;
+    const calcBoard = new CalcBoard(game.board, false, game.targetBoard, game.targetStatus);
+    game.targetStatus = calcBoard.solutionType();
+    if (!game.targetBoard) {
+      game.targetBoard = calcBoard.targetBoard;
+    }
+    return game.targetStatus;
   }
 
   static solveGame(game) {
@@ -270,33 +310,52 @@ export class Calc {
     const calcBoard = new CalcBoard(game.board);
     calcBoard.trySolve([]);
     calcBoard.updateGameBoard(game);
+    Sudoku.gameSolvedTest();
   }
 
   static simpleReduceFromFixed(board) {
-    for (var g = 0; g < this.grpIx.length; g++) {
-      var gx = this.grpIx[g];
-      var fixed = this.getFixedInGrp(board, gx);
+    for (var g = 0; g < Calc.grpIx.length; g++) {
+      var gx = Calc.grpIx[g];
+      var fixed = Calc.getFixedInGrp(board, gx);
       if (fixed !== 0) {
-        this.reduceNonSolved(board, gx, ~fixed, true);
+        Calc.reduceNonSolved(board, gx, fixed, true);
       }
     }
     return board;
+  }
+  static simpleReduceFromDetermined(board) {
+    let nrReduced = 0;
+    for (var g = 0; g < Calc.grpIx.length; g++) {
+      var gx = Calc.grpIx[g];
+      var determined = this.getDeterminedInGrp(board, gx);
+      if (determined !== 0) {
+        nrReduced += Calc.reduceNonSolved(board, gx, determined, false);
+      }
+    }
+    return nrReduced;
   }
 
   static getFixedInGrp(board, gx) {
     let fixedBits = 0;
     gx.forEach(ix => {
-      if (this.isFixed(board[ix])) fixedBits |= board[ix] & this.symbolBits;
+      if (Calc.isFixed(board[ix])) fixedBits |= board[ix] & Calc.symbolBits;
     });
     return fixedBits;
   }
-  static reduceNonSolved(board, gx, invReduceBits, fixedOnly = false) {
+  static getDeterminedInGrp(board, gx) {
+    let determinedBits = 0;
+    gx.forEach(ix => {
+      if (Calc.isDetermined(board[ix])) determinedBits |= board[ix] & Calc.symbolBits;
+    });
+    return determinedBits;
+  }
+  static reduceNonSolved(board, gx, reduceBits, fixedOnly = false) {
     let nrSquaresReduced = 0;
-    const solvedFunc = fixedOnly ? this.isFixed : this.isDetermined;
+    const solvedFunc = fixedOnly ? Calc.isFixed : Calc.isDetermined;
     gx.forEach(ix => {
       //if (!solvedFunc.call(this, board[ix]) && (board[ix] & invReduceBits) !== 0)
-      if (!solvedFunc(board[ix]) && (board[ix] & invReduceBits) !== 0) {
-        board[ix] &= invReduceBits;
+      if (!solvedFunc(board[ix]) && (board[ix] & reduceBits) !== 0) {
+        board[ix] &= ~reduceBits;
         ++nrSquaresReduced;
       }
     });
@@ -304,9 +363,9 @@ export class Calc {
   }
   static reduceFromSquare(board, ix) {
     let nrSquaresReduced = 0;
-    const invBits = ~(board[ix] & this.symbolBits);
-    const grps = this.groupsOfSquare(ix);
-    grps.forEach(gx => (nrSquaresReduced += this.reduceNonSolved(board, gx, invBits)));
+    //const invBits = ~(board[ix] & this.symbolBits);
+    const grps = Calc.groupsOfSquare(ix);
+    grps.forEach(gx => (nrSquaresReduced += Calc.reduceNonSolved(board, gx, board[ix] & Calc.symbolBits)));
     return nrSquaresReduced;
   }
   // static reduceFromDecidedSquare(wb, ix, reduced) {
@@ -700,6 +759,53 @@ export class Calc {
   //   //console.log("FALSE", level, undecidedIndex, undecidedBoardIx, origSq);
   //   return false;
   // }
+  static turn(board, turned) {
+    for (let r = 0; r < Calc.nrSymbols; r++) {
+      let gxr = Calc.grpIx[r];
+      let gxc = Calc.grpIx[2 * Calc.nrSymbols - 1 - r];
+      for (let i = 0; i < Calc.nrSymbols; i++) {
+        turned[gxc[i]] = board[gxr[i]];
+      }
+    }
+  }
+  static twist(board, twisted) {
+    for (let r = 0; r < Calc.nrSymbols; r++) {
+      let gx = Calc.grpIx[r];
+      let gxr = Calc.grpIx[Calc.nrSymbols - 1 - r];
+      for (let i = 0; i < Calc.nrSymbols; i++) {
+        twisted[gxr[i]] = board[gx[i]];
+      }
+    }
+  }
+  static permutate(board) {
+    const perm = Array(Calc.nrSymbols);
+    for (let i = 0; i < Calc.nrSymbols; i++) perm[i] = i;
+    Calc.shuffle(perm);
+    for (let i = 0; i < board.length; i++) {
+      let v = board[i];
+      if (Calc.isDetermined(v)) {
+        let s0 = Calc.symbolFromBit(v);
+        let s1 = (s0 > 0 ? perm[s0 - 1] : (console.log("permutate ERROR!"), 0)) + 1;
+        v &= ~Calc.symbolBits;
+        v |= Calc.getSymbolBit(s1);
+        board[i] = v;
+      }
+    }
+  }
+  static twistAndTurn(board) {
+    let b1 = board;
+    let b2 = Calc.cleanBoard();
+    for (let tu = Math.random() * 4; tu > 0; tu = tu - 1) {
+      Calc.turn(b1, b2);
+      [b1, b2] = [b2, b1];
+    }
+    if (true || Math.random() > 0.5) {
+      Calc.twist(b1, b2);
+      [b1, b2] = [b2, b1];
+    }
+    Calc.permutate(board);
+    if (b1 !== board) Calc.copyFrom(b1, board);
+  }
 
   static deepCopy(ary) {
     if (!Array.isArray(ary)) return ary;
