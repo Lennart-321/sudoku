@@ -4,6 +4,7 @@
   gap: 0.2rem;
   text-align: start;
   user-select: none;
+  margin: 1rem 0;
 }
 .dropbtn {
   font-size: 1.2rem;

@@ -64,7 +64,7 @@ export class Settings {
       if (isOn && !Settings.showOnlyEditedHelp) {
         Settings.showOnlyEditedHelp = true;
       }
-      Sudoku.updateMenu();
+      Sudoku.updateMenu && Sudoku.updateMenu();
     }
   }
 }

@@ -3,11 +3,14 @@ body {
   background-color: lightgrey;
 }
 :root {
+  position: relative;
+  /* background-color: #eee; */
+
   --fontSize: 10px;
   /* tot cell mrg = 6*bigmrg + 12*smlmrg  */
   --bigmrg: 0.2rem;
   --smlmrg: 0.075rem;
-  --boardBoarder: 0.4rem;
+  --boardBorder: 0.4rem;
   --boardSz: 54rem;
   --cellSz: calc((var(--boardSz) - 6 * var(--bigmrg) - 12 * var(--smlmrg)) / 9);
   --helpSz: calc(var(--cellSz) / 3);

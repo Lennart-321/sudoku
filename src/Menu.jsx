@@ -74,6 +74,14 @@ export function Menu({ refresh }) {
           {onOffMenuItem("Show Errors", Settings.showErrors, Settings.toggleShowErrors)}
         </div>
       </div>
+      <div className="dropdown">
+        <button className="dropbtn">
+          Other
+        </button>
+        <div className="dropdown-content settings">
+          <a className="menu-alt" onClick={Sudoku.showSudokuInfo}>Info</a>
+        </div>
+      </div>
     </nav>
   );
 }

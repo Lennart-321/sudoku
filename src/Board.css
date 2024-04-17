@@ -8,11 +8,14 @@
 
   /* background-color: rgba(0, 0, 0, 0.5); */
   background-color: gray;
-  border: var(--boardBoarder) gray solid;
+  border: var(--boardBorder) gray solid;
   border-radius: 0.3rem;
+  margin: 0;
+  padding: 0;
 }
 
 .cell {
+  --cell-backgroud: #fdfdfd;
   width: var(--cellSz);
   height: var(--cellSz);
   font-size: 4rem;
@@ -20,7 +23,7 @@
   line-height: var(--cellSz);
   border-radius: 0.2rem;
   user-select: none;
-  background-color: white;
+  background-color: var(--cell-backgroud);
 
   /* margin: 0.1rem; */
   /* display: grid;
@@ -31,7 +34,6 @@
 .cell > .help-grid {
   display: none;
 }
-
 .cell.empty:hover > .help-grid,
 .cell.help > .help-grid {
   width: 100%;
@@ -65,17 +67,18 @@
   display: inline;
 }
 .cell.help .help-symbol.reduced {
-  color: rgb(245, 245, 245); /*TODO*/
+  /* color: rgb(245, 245, 245); */
+  color: var(--cell-backgroud);
 }
 
 .cell {
-  color: blue;
+  color: #06d;
 }
 .cell.fixed {
-  color: black;
+  color: #333;
 }
 .cell.wrong {
-  color: red;
+  color: #c00;
 }
 
 .help-symbol {

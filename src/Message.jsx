@@ -5,7 +5,6 @@ import "./Message.css";
 let currentMessageId = 0;
 export function Message(/*{ removeMessage, jsxMessage, timeoutSec }*/) {
   const [messageInfo, setMessage] = useState([null, 0]);
-  //const messageId = useRef(0);
   const timeOutId = useRef(0);
   const thisMessageId = ++currentMessageId;
 

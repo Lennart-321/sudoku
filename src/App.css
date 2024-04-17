@@ -1,15 +1,17 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
+  /* padding: 1rem 0 0 0; */
   text-align: center;
   display: grid;
-  grid-template-rows: 3rem 1fr;
+  grid-template-rows: auto 1fr;
   justify-content: center;
   /* background-color: lightgrey; */
+  /* background-color: aliceblue; */
 }
 
-.logo {
+/* .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
@@ -43,4 +45,4 @@
 
 .read-the-docs {
   color: #888;
-}
+} */

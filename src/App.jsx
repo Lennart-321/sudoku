@@ -1,10 +1,8 @@
 import { useState } from "react";
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "/vite.svg";
 import Board from "./Board.jsx";
-import { Game } from "./Game.js";
-import "./App.css";
 import { Menu } from "./Menu.jsx";
+import { Message } from "./Message.jsx";
+import "./App.css";
 
 //const glbDefaultGame = new Game();
 function App() {
@@ -26,6 +24,7 @@ function App() {
     <>
       <Menu refresh={refresh} />
       <Board />
+      <Message />
     </>
   );
 

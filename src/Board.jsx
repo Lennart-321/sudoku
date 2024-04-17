@@ -2,7 +2,6 @@ import { useState } from "react";
 import "./Board.css";
 import Cell from "./Cell.jsx";
 import { Sudoku } from "./Sudoku.js";
-import { Message } from "./Message.jsx";
 
 export default function Board() {
   const [updateCount, setUpdateCount] = useState(0);
@@ -20,8 +19,6 @@ export default function Board() {
           <Cell key={ix} index={ix} boardChanged={setUpdateCount} />
         ))}
       </div>
-      <Message />
-      {/*messageComp*/}
     </>
   );
 }

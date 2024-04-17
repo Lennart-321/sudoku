@@ -168,4 +168,16 @@ export class Sudoku {
     const nrRed = Calc.simpleReduceFromDetermined(Sudoku.currentGame.board);
     return nrRed > 0;
   }
+  static showSudokuInfo() {
+    Sudoku.importantMessage &&
+      Sudoku.importantMessage(
+        [
+          //"SUDOKU by Lennart",
+          "Use Ctrl + click to keep support symbol.",
+          "Use Ctrl + click to focus on more than one symbol.",
+        ],
+        "#333",
+        0
+      );
+  }
 }
