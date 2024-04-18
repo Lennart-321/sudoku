@@ -9,7 +9,15 @@ export class CalcBoard {
   targetBoard;
   targetStatus; //0=Unknown, 1=Some solution, 3=Unique solution, 5=Not unique solution, 8=Not solvable, -1=ERROR
 
-  constructor(board, isWorkBord = false, targetBoard = null, targetStatus = 0, solvedIxs = null, unsolvedIxs = null) {
+  constructor(
+    board,
+    isWorkBord = false,
+    targetBoard = null,
+    targetStatus = 0,
+    solvedIxs = null,
+    unsolvedIxs = null,
+    discardSolved
+  ) {
     this.board = Calc.copyBoard(board);
     this.targetBoard = targetBoard;
     this.targetStatus = targetStatus;
@@ -17,7 +25,7 @@ export class CalcBoard {
     this.unsolvedIxs = unsolvedIxs;
     this.solvedN = null;
     if (!isWorkBord) {
-      Calc.transformToWorkBoard(this.board);
+      Calc.transformToWorkBoard(this.board, discardSolved);
     }
   }
 

@@ -264,10 +264,11 @@ export class Calc {
     }
   }
 
-  static transformToWorkBoard(board) {
+  static transformToWorkBoard(board, discardSolved = false) {
     //Keep only symbolbits
+    const keepCriteriaBits = discardSolved ? Calc.isFixedBit : Calc.isDeterminedBit | Calc.isFixedBit;
     for (var i = 0; i < board.length; i++) {
-      if ((board[i] & (Calc.isDeterminedBit | Calc.isFixedBit)) !== 0) {
+      if ((board[i] & keepCriteriaBits) !== 0) {
         board[i] &= Calc.symbolBits;
       } else {
         board[i] = Calc.symbolBits;
@@ -307,7 +308,15 @@ export class Calc {
 
   static solutionType(game) {
     if (game.targetStatus > 1) return game.targetStatus;
-    const calcBoard = new CalcBoard(game.board, false, game.targetBoard, game.targetStatus);
+    const calcBoard = new CalcBoard(
+      game.board,
+      false,
+      game.targetBoard,
+      game.targetStatus,
+      null,
+      null,
+      true /*discard solved*/
+    );
     game.targetStatus = calcBoard.solutionType();
     if (!game.targetBoard) {
       game.targetBoard = calcBoard.targetBoard;
@@ -378,26 +387,6 @@ export class Calc {
     grps.forEach(gx => (nrSquaresReduced += Calc.reduceNonSolved(board, gx, board[ix] & Calc.symbolBits)));
     return nrSquaresReduced;
   }
-  // static reduceFromDecidedSquare(wb, ix, reduced) {
-  //   const solvedSym = wb[ix];
-  //   const invSolvedSym = ~solvedSym;
-  //   const grps = Calc.groupsOfSquare(ix);
-
-  //   for (var g = 0; g < grps.length; g++) {
-  //     for (var m = 0; m < grps[g].length; m++) {
-  //       var bix = grps[g][m];
-  //       if (bix != ix && (wb[bix] & solvedSym) !== 0) {
-  //         if (wb[bix] === solvedSym) {
-  //           //ERROR: no candidates left
-  //           return false;
-  //         }
-  //         wb[bix] &= invSolvedSym;
-  //         reduced.push(bix);
-  //       }
-  //     }
-  //   }
-  //   return true;
-  // }
 
   static groupsOfSquare(sq) {
     return Calc.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq];
@@ -507,58 +496,58 @@ export class Calc {
     return [gx, solvedBits];
   }
 
-  //Only 2 symbols in 2 square. Reduce those symbols from rest of group...
-  //...and 2 symbols only in 2 squares. Reduce other symbols from those squares.
-  //Assumes 1 reduced before
-  static reduceGroupsAndSquares2(wb, gx, doForSymbolsBits = Calc.symbolBits) {
-    let solvedBits;
-    [gx, solvedBits] = Calc.removeSolvedSquares(wb, gx);
-    doForSymbolsBits &= ~solvedBits;
+  // //Only 2 symbols in 2 square. Reduce those symbols from rest of group...
+  // //...and 2 symbols only in 2 squares. Reduce other symbols from those squares.
+  // //Assumes 1 reduced before
+  // static reduceGroupsAndSquares2(wb, gx, doForSymbolsBits = Calc.symbolBits) {
+  //   let solvedBits;
+  //   [gx, solvedBits] = Calc.removeSolvedSquares(wb, gx);
+  //   doForSymbolsBits &= ~solvedBits;
 
-    const sqixOfSym = Array(Calc.nrSymbols);
-    let symbolBit = 1;
-    for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
-      if ((symbolBit & doForSymbolsBits) === 0) continue;
-      sqixOfSym[s] = Calc.squareBitsOfSymbol(wb, gx, symbolBit);
-    }
+  //   const sqixOfSym = Array(Calc.nrSymbols);
+  //   let symbolBit = 1;
+  //   for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
+  //     if ((symbolBit & doForSymbolsBits) === 0) continue;
+  //     sqixOfSym[s] = Calc.squareBitsOfSymbol(wb, gx, symbolBit);
+  //   }
 
-    symbolBit = 1;
-    for (let s1 = 0; s1 < Calc.nrSymbols; s1++, symbolBit <<= 1) {
-      if ((symbolBit & doForSymbolsBits) !== 0) continue;
-      let symbolBit2 = 1;
-      for (let s2 = 0; s2 < Calc.nrSymbols; s2++, symbolBit2 <<= 1) {
-        if ((symbolBit & doForSymbolsBits) !== 0 || s1 === s2) continue;
+  //   symbolBit = 1;
+  //   for (let s1 = 0; s1 < Calc.nrSymbols; s1++, symbolBit <<= 1) {
+  //     if ((symbolBit & doForSymbolsBits) !== 0) continue;
+  //     let symbolBit2 = 1;
+  //     for (let s2 = 0; s2 < Calc.nrSymbols; s2++, symbolBit2 <<= 1) {
+  //       if ((symbolBit & doForSymbolsBits) !== 0 || s1 === s2) continue;
 
-        const combSymBits = symbolBit | symbolBit2;
+  //       const combSymBits = symbolBit | symbolBit2;
 
-        let eqCount = 0;
-        let firstEqIx = -1;
-        for (let g = 0; g < gx.length; g++) {
-          if (wb[gx[g]] === combSymBits) {
-            if (++eqCount === 2) {
-              for (let g2 = 0; g2 < gx.length; g2++) {
-                if (g2 === firstEqIx || g2 === g) continue;
-                wb[gx[g2]] &= ~combSymBits;
-              }
+  //       let eqCount = 0;
+  //       let firstEqIx = -1;
+  //       for (let g = 0; g < gx.length; g++) {
+  //         if (wb[gx[g]] === combSymBits) {
+  //           if (++eqCount === 2) {
+  //             for (let g2 = 0; g2 < gx.length; g2++) {
+  //               if (g2 === firstEqIx || g2 === g) continue;
+  //               wb[gx[g2]] &= ~combSymBits;
+  //             }
 
-              return true;
-            }
-            firstEqIx = g;
-          }
-        }
+  //             return true;
+  //           }
+  //           firstEqIx = g;
+  //         }
+  //       }
 
-        if (
-          sqixOfSym[s1] === sqixOfSym[s2] &&
-          Calc.symbolCount(sqixOfSym[s1]) === 2 /*Calc.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
-        ) {
-          const gIxs = Calc.bitIxs(sqixOfSym[s1]);
-          gIxs.forEach(gIx => (wb[gx[gIx]] &= combSymBits));
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  //       if (
+  //         sqixOfSym[s1] === sqixOfSym[s2] &&
+  //         Calc.symbolCount(sqixOfSym[s1]) === 2 /*Calc.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
+  //       ) {
+  //         const gIxs = Calc.bitIxs(sqixOfSym[s1]);
+  //         gIxs.forEach(gIx => (wb[gx[gIx]] &= combSymBits));
+  //         return true;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
 
   //Only 2 symbols in 2 square. Reduce those symbols from rest of group.
   //Assumes 1 reduced before

@@ -7,7 +7,7 @@ import { Calc } from "./Calc.js";
 import { globalTest } from "./test.js";
 
 Calc.initClass();
-globalTest();
+//globalTest();
 const setSize = () => {
   //console.log("W/H", window.innerWidth, window.innerHeight + 40);
   let winSize = Math.min(window.innerWidth, window.innerHeight);
