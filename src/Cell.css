@@ -70,11 +70,11 @@
   font-size: 1.1rem;
 }
 .help-symbol.candidate.out-of-focus {
-  color: #ccc;
+  color: #e7e7e7;
 }
 
 .cell/*.help*/:hover .help-symbol.help-symbol/*.reduced*/ {
-  border: 0.5px solid #f7f7f7;
+  /* border: 0.5px solid #f7f7f7; */
   color: #06d;
 }
 .cell.cell .help-symbol:hover {

@@ -18,6 +18,14 @@ export function globalTest() {
   // let res = testBoard.trySolve();
   // console.log("TEST testBoard.trySolve() =>", res);
 
+  // console.log("Test: Comibation loop");
+  // let count = 0;
+  // for (let comb = Calc.firstCombination(4); comb.length > 0; Calc.nextCombination(comb, 7)) {
+  //   console.log(comb);
+  //   count++;
+  // }
+  // console.log(count);
+
   test_reduceSqAndGrpN();
   test_reduceOtherGroup();
   test_trySolve();

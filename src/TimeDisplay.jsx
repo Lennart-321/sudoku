@@ -11,12 +11,13 @@ export function TimeDisplay() {
 
   const show = Settings.showTime && !!Sudoku.currentGame?.startTime;
   if (show) {
-    const elapsed =
-      (Sudoku.currentGame.isSolved ? Sudoku.currentGame.solvedTime : new Date()) - Sudoku.currentGame.startTime;
-    const seconds = Math.floor(elapsed / 1000);
+    let elapsed =
+      (Sudoku.currentGame.isSolved ? Sudoku.currentGame.solvedTime : Sudoku.now()) - Sudoku.currentGame.startTime;
+    if (!elapsed) elapsed = 0;
+    const seconds = Math.floor(elapsed / 10);
     var timeStr = Sudoku.formatDuration(seconds);
     if (!Sudoku.currentGame.isSolved) {
-      setTimeout(() => setUpdateCount(c => c + 1), 1001 - (elapsed % 1000));
+      setTimeout(() => setUpdateCount(c => c + 1), 1001 - (elapsed % 10) * 100);
     }
   }
 

@@ -11,7 +11,7 @@ Calc.initClass();
 const setSize = () => {
   //console.log("W/H", window.innerWidth, window.innerHeight + 40);
   let winSize = Math.min(window.innerWidth, window.innerHeight);
-  let fontSize = Math.floor(winSize / 65);
+  let fontSize = Math.floor(winSize / 66);
   document.documentElement.style.setProperty("--fontSize", `${fontSize}px`);
 };
 setSize();
@@ -22,12 +22,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <App />
   </React.StrictMode>
 );
-
-//Test stuff
-// console.log("Test: Comibation loop");
-// let count = 0;
-// for (let comb = Calc.firstCombination(4); comb.length > 0; Calc.nextCombination(comb, 7)) {
-//   console.log(comb);
-//   count++;
-// }
-// console.log(count);

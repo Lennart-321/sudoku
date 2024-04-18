@@ -13,7 +13,7 @@ export function Message(/*{ removeMessage, jsxMessage, timeoutSec }*/) {
     timeOutId.current = 0;
   }
 
-  Sudoku.importantMessage = function (message, color = "#080", timeoutSec = 4) {
+  Sudoku.importantMessage = function (message, color = "#000", timeoutSec = 0) {
     let jsx;
     if (Array.isArray(message)) {
       jsx = message.map((m, ix) => (

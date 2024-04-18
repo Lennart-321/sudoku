@@ -12,6 +12,8 @@ export class Sudoku {
   static importantMessage = null;
   static updateMenu = null;
   static updateTimeDisplay = null;
+  static highGameNumberStored = -1;
+  static currentGameNumberStored = -1;
 
   constructor() {}
 
@@ -85,6 +87,7 @@ export class Sudoku {
           const nrRed = Calc.reduceFromSquare(Sudoku.currentGame.board, index);
           if (nrRed > 0) otherChanged = true;
         }
+        Sudoku.saveGame();
       }
     }
 
@@ -108,11 +111,11 @@ export class Sudoku {
     const solved = Calc.isSolved(Sudoku.currentGame.board);
     if (solved && !Sudoku.currentGame.isSolved) {
       Sudoku.currentGame.isSolved = true;
-      Sudoku.currentGame.solvedTime = new Date();
+      Sudoku.currentGame.solvedTime = Sudoku.now();
       let duration = Math.floor((Sudoku.currentGame.solvedTime - Sudoku.currentGame.startTime) / 1000);
 
       Sudoku.importantMessage &&
-        Sudoku.importantMessage(["Solved!", "Time: " + Sudoku.formatDuration(duration, true)], "#0A0", 30);
+        Sudoku.importantMessage(["Solved!", "Time: " + Sudoku.formatDuration(duration, true)], "#0A0", 4);
     }
     return solved;
   }
@@ -128,6 +131,9 @@ export class Sudoku {
         Sudoku.currentGame.isSolved = false;
         Sudoku.updateTimeDisplay && Sudoku.updateTimeDisplay();
       }
+    }
+    if (v0 !== value) {
+      Sudoku.saveGame();
     }
     return v0 !== value;
   }
@@ -155,15 +161,21 @@ export class Sudoku {
   static createNewGame(level) {
     let needInitialReduce = Settings.autoReduceHelpSymbols;
 
+    //Normal new game
     if (level >= 0) {
       Sudoku.currentGame = CalcBoard.generateNewGame(level);
       console.log("createNewGame autoReduceHelpSymbols =", Settings.autoReduceHelpSymbols);
       Sudoku.isDefineGameState = false;
-    } else if (level === -2) {
+      Sudoku.currentGameNumberStored = -1;
+    }
+    //Restart game
+    else if (level === -2) {
       Calc.restartGame(Sudoku.currentGame.board);
-      Sudoku.currentGame.startTime = new Date();
+      Sudoku.currentGame.startTime = Sudoku.now();
       Sudoku.currentGame.isSolved = false;
-    } else if (level === -1 && Sudoku.isDefineGameState) {
+    }
+    //Start new user defined game
+    else if (level === -1 && Sudoku.isDefineGameState) {
       Sudoku.isDefineGameState = false;
 
       Calc.definedGame(Sudoku.currentGame.board);
@@ -184,15 +196,19 @@ export class Sudoku {
       }
       if (message && Sudoku.importantMessage) {
         Sudoku.importantMessage(message, "#F00", 7);
+      } else {
+        Sudoku.saveGame();
       }
-
-      Sudoku.currentGame.startTime = new Date();
+      Sudoku.currentGame.startTime = Sudoku.now();
       Sudoku.currentGame.isSolved = false;
-    } else if (level === -1) {
+    }
+    //Let user define game; Clear board; Enter definition mode
+    else if (level === -1) {
       Sudoku.currentGame = new Game(Array(Calc.nrSquares).fill(Calc.symbolBits));
       Sudoku.currentGame.startTime = null;
       Sudoku.isDefineGameState = true;
       needInitialReduce = false;
+      Sudoku.currentGameNumberStored = -1;
     }
 
     if (needInitialReduce) {
@@ -231,5 +247,93 @@ export class Sudoku {
         "#333",
         0
       );
+  }
+  //   static confirmCommand(message, command) {
+  //     Sudoku.importantMessage(message, "#000", 10, command);
+  //   }
+
+  static canLoadPre() {
+    return false && Sudoku.currentGameNumberStored !== 0 && Sudoku.getHighGameNumber() > 0;
+  }
+  static canLoadNx() {
+    return false && 0 <= Sudoku.currentGameNumberStored && Sudoku.currentGameNumberStored < Sudoku.getHighGameNumber();
+  }
+
+  static loadPreviousGame() {
+    if (Sudoku.currentGameNumberStored === 0) return false;
+
+    const preCurNr = Sudoku.currentGameNumberStored;
+    if (Sudoku.currentGameNumberStored < 0) {
+      const hgn = this.getHighGameNumber();
+      if (hgn < 0) return false;
+      Sudoku.currentGameNumberStored = hgn;
+    } else {
+      Sudoku.currentGameNumberStored--;
+    }
+
+    if (!Sudoku.loadGame()) {
+      Sudoku.currentGameNumberStored = preCurNr;
+      return false;
+    }
+    Sudoku.refreshApp && Sudoku.refreshApp();
+    return true;
+  }
+
+  static loadNextGame() {
+    if (Sudoku.currentGameNumberStored < 0) return false;
+    const hgn = Sudoku.getHighGameNumber();
+    if (Sudoku.currentGameNumberStored >= hgn) return false;
+    Sudoku.currentGameNumberStored++;
+
+    if (!Sudoku.loadGame()) {
+      Sudoku.currentGameNumberStored--;
+      return false;
+    }
+
+    Sudoku.refreshApp && Sudoku.refreshApp();
+    return true;
+  }
+
+  static saveGame() {
+    return;
+    if (Sudoku.currentGameNumberStored < 0) {
+      Sudoku.getHighGameNumber();
+      Sudoku.currentGameNumberStored = ++Sudoku.highGameNumberStored;
+      localStorage.setItem("highGameNr", Sudoku.highGameNumberStored.toString());
+    }
+    const gameJson = JSON.stringify(Sudoku.currentGame);
+    localStorage.setItem(Sudoku.currentGameNumberStored.toString(), gameJson);
+  }
+  static loadGame() {
+    return false;
+    if (Sudoku.currentGameNumberStored < 0) {
+      Sudoku.getHighGameNumber();
+      Sudoku.currentGameNumberStored = Sudoku.highGameNumberStored;
+      if (Sudoku.currentGameNumberStored < 0) return;
+    }
+    const gameJson = localStorage.getItem(Sudoku.currentGameNumberStored.toString());
+    const loadedGame = JSON.parse(gameJson);
+    if (loadedGame) {
+      Sudoku.currentGame = loadedGame;
+      return true;
+    }
+    return false;
+  }
+  static getHighGameNumber() {
+    if (Sudoku.highGameNumberStored < 0) {
+      Sudoku.highGameNumberStored = Sudoku.loadNumber("highGameNr");
+    }
+    return Sudoku.highGameNumberStored;
+  }
+  static loadNumber(id) {
+    const jsonNum = localStorage.getItem(id);
+    let num = parseInt(jsonNum);
+    if (!Number.isInteger(num)) {
+      num = -1;
+    }
+    return num;
+  }
+  static now() {
+    return Math.floor(new Date().getTime() / 100);
   }
 }

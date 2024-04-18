@@ -17,6 +17,11 @@ export function Menu({ refresh }) {
     refresh();
   };
 
+  const solveGame = function () {
+    Calc.solveGame(Sudoku.currentGame);
+    refresh();
+  };
+
   // prettier-ignore
   const onOffMenuItem = function (text, setting, settingsMethod) {
     return (
@@ -28,11 +33,6 @@ export function Menu({ refresh }) {
     );
   };
 
-  const solveGame = function () {
-    Calc.solveGame(Sudoku.currentGame);
-    refresh();
-  };
-
   // prettier-ignore
   return (
     <header className="header">
@@ -42,24 +42,14 @@ export function Menu({ refresh }) {
             Game
           </button>
           <div className="dropdown-content">
-            <a className="menu-alt" onClick={() => newGame(1)}>
-              New Easy
-            </a>
-            <a className="menu-alt" onClick={() => newGame(2)}>
-              New Medium
-            </a>
-            <a className="menu-alt" onClick={() => newGame(100)}>
-              New Hard
-            </a>
-            <a className="menu-alt" onClick={() => newGame()}>
-              New Random
-            </a>
-            <a className="menu-alt" onClick={() => newGame(-1)}>
-              {Sudoku.isDefineGameState ? "Start my game" : "Define Game"}
-            </a>
-            <a className="menu-alt" onClick={() => newGame(-2)}>
-              Restart
-            </a>
+            <a className="menu-alt" onClick={() => newGame(1)}>New Easy</a>
+            <a className="menu-alt" onClick={() => newGame(2)}>New Medium</a>
+            <a className="menu-alt" onClick={() => newGame(100)}>New Hard</a>
+            <a className="menu-alt" onClick={() => newGame()}>New Random</a>
+            <a className="menu-alt" onClick={() => newGame(-1)}>{Sudoku.isDefineGameState ? "Start my game" : "Define Game"}</a>
+            <a className="menu-alt" onClick={() => newGame(-2)}>Restart</a>
+            {Sudoku.canLoadPre() ? <a className="menu-alt" onClick={() => Sudoku.loadPreviousGame()}>Previous game</a> : <></>}
+            {Sudoku.canLoadNx() ? <a className="menu-alt" onClick={() => Sudoku.loadNextGame()}>Next game</a> : <></>}
           </div>
         </div>
         <div className="dropdown">

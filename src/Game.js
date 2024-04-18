@@ -1,5 +1,6 @@
 import { Calc } from "./Calc";
 import { CalcBoard } from "./CalcBoard";
+import { Sudoku } from "./Sudoku";
 
 export class Game {
   board;
@@ -27,7 +28,7 @@ export class Game {
     this.targetBoard = trg;
     this.targetStatus = trgStat !== undefined ? trgStat : trg ? 1 : 0;
     this.isSolved = false;
-    this.startTime = new Date();
+    this.startTime = Sudoku.now();
     this.solvedTime = null;
   }
   copy() {
