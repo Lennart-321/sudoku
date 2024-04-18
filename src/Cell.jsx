@@ -4,6 +4,7 @@ import { Calc } from "./Calc.js";
 import { Settings } from "./Settings.js";
 //import { CalcBoard } from "./CalcBoard.js";
 import { Sudoku } from "./Sudoku.js";
+import "./Cell.css";
 //mode = "selected" | "fixed" | "empty" | "help" | "wrong" /*"note"*/
 //let counter = 0;
 //prettier-ignore

@@ -1,0 +1,115 @@
+/*** .cell ***/
+.cell {
+  --cell-backgroud: #fdfdfd;
+  width: var(--cellSz);
+  height: var(--cellSz);
+  font-size: 4rem;
+  text-align: center;
+  line-height: var(--cellSz);
+  border-radius: 0.2rem;
+  user-select: none;
+  background-color: var(--cell-backgroud);
+}
+.cell {
+  color: #06d;
+}
+.cell.fixed {
+  color: #333;
+}
+.cell.wrong {
+  color: #c00;
+}
+.cell.out-of-focus {
+  background-color: #ccc;
+  color: #bbb;
+}
+
+/*** .determined-symbol ***/
+.determined-symbol {
+  display: inline;
+  width: var(--cellSz);
+  height: var(--cellSz);
+  line-height: var(--cellSz);
+}
+.cell.help > .determined-symbol {
+  display: none;
+}
+
+/*** .help-grid ***/
+.cell > .help-grid {
+  display: none;
+}
+.cell.empty:hover > .help-grid,
+.cell.help > .help-grid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+/*** .help-symbol ***/
+.cell.help .help-symbol {
+  display: inline;
+}
+.cell.help .help-symbol.reduced {
+  color: var(--cell-backgroud);
+}
+.help-symbol {
+  width: var(--helpSz);
+  height: var(--helpSz);
+  font-size: 0.9rem;
+  line-height: var(--helpSz);
+
+  box-sizing: border-box;
+
+  cursor: pointer;
+}
+.cell.help .help-symbol.candidate {
+  font-weight: bolder;
+  font-size: 1.1rem;
+}
+.help-symbol.candidate.out-of-focus {
+  color: #ccc;
+}
+
+.cell/*.help*/:hover .help-symbol.help-symbol/*.reduced*/ {
+  border: 0.5px solid #f7f7f7;
+  color: #06d;
+}
+.cell.cell .help-symbol:hover {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/*** Cell margins - for displaing sudoku grid ***/
+
+.h0.v0 {
+  margin: var(--bigmrg) var(--smlmrg) var(--smlmrg) var(--bigmrg);
+}
+.h0.v1 {
+  margin: var(--smlmrg) var(--smlmrg) var(--smlmrg) var(--bigmrg);
+}
+.h0.v2 {
+  margin: var(--smlmrg) var(--smlmrg) var(--bigmrg) var(--bigmrg);
+}
+
+.h1.v0 {
+  margin: var(--bigmrg) var(--smlmrg) var(--smlmrg) var(--smlmrg);
+}
+.h1.v1 {
+  margin: var(--smlmrg) var(--smlmrg) var(--smlmrg) var(--smlmrg);
+}
+.h1.v2 {
+  margin: var(--smlmrg) var(--smlmrg) var(--bigmrg) var(--smlmrg);
+}
+
+.h2.v0 {
+  margin: var(--bigmrg) var(--bigmrg) var(--smlmrg) var(--smlmrg);
+}
+.h2.v1 {
+  margin: var(--smlmrg) var(--bigmrg) var(--smlmrg) var(--smlmrg);
+}
+.h2.v2 {
+  margin: var(--smlmrg) var(--bigmrg) var(--bigmrg) var(--smlmrg);
+}

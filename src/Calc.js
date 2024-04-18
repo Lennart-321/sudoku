@@ -4,23 +4,23 @@ import { Sudoku } from "./Sudoku";
 export class Calc {
   static initClass() {
     //symbolCount optimization
-    const nrValues = Math.pow(2, this.nrSymbols);
-    this.bitCountArray_UsedBy_symbolCount = new Array(nrValues);
+    const nrValues = Math.pow(2, Calc.nrSymbols);
+    Calc.bitCountArray_UsedBy_symbolCount = new Array(nrValues);
     for (var value = 0; value < nrValues; value++) {
       let count = 0;
       let bit = 1;
-      for (let i = 0; i < this.nrSymbols; i++, bit <<= 1) {
+      for (let i = 0; i < Calc.nrSymbols; i++, bit <<= 1) {
         if (value & bit) count++;
       }
-      this.bitCountArray_UsedBy_symbolCount[value] = count;
+      Calc.bitCountArray_UsedBy_symbolCount[value] = count;
     }
 
     //groupsOfSquare optimization
-    this.groupBelongingOfSquares_UsedBy_groupsOfSquare = Array(this.nrSquares);
-    for (var sq = 0; sq < this.nrSquares; sq++) {
-      this.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq] = [];
-      this.grpIx.forEach((gx, gxIx) => {
-        if (gx.includes(sq)) this.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq].push(gx);
+    Calc.groupBelongingOfSquares_UsedBy_groupsOfSquare = Array(Calc.nrSquares);
+    for (var sq = 0; sq < Calc.nrSquares; sq++) {
+      Calc.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq] = [];
+      Calc.grpIx.forEach((gx, gxIx) => {
+        if (gx.includes(sq)) Calc.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq].push(gx);
       });
     }
 
@@ -29,8 +29,8 @@ export class Calc {
     console.log(
       "Calc.initClass() #symbolvalues=",
       nrValues,
-      this.bitCountArray_UsedBy_symbolCount.length,
-      this.bitCountArray_UsedBy_symbolCount[nrValues - 1]
+      Calc.bitCountArray_UsedBy_symbolCount.length,
+      Calc.bitCountArray_UsedBy_symbolCount[nrValues - 1]
     );
   }
   //static showHelpsymolsBit = 0x200;
@@ -123,13 +123,13 @@ export class Calc {
   //   return (squareBits[0] & squareBits[1] & squareBits[2]) === 0x7ffffff;
   // }
   // static setSquareBit(bits, bitIx) {
-  //   bits[Math.floor(bitIx / 27)] |= this.bits27[bitIx % 27]; //1 << (bitIx % 27);
+  //   bits[Math.floor(bitIx / 27)] |= Calc.bits27[bitIx % 27]; //1 << (bitIx % 27);
   // }
   // static isSquareBit(bits, bitIx) {
-  //   return (bits[Math.floor(bitIx / 27)] & this.bits27[bitIx % 27]) !== 0; //1 << (bitIx % 27);
+  //   return (bits[Math.floor(bitIx / 27)] & Calc.bits27[bitIx % 27]) !== 0; //1 << (bitIx % 27);
   // }
 
-  static firstBoxGroup = 18; //2 * this.grpIx.length / 3;
+  static firstBoxGroup = 18; //2 * Calc.grpIx.length / 3;
   static isFixed(value) {
     return (value & Calc.isFixedBit) !== 0;
   }
@@ -218,24 +218,24 @@ export class Calc {
   }
 
   static determinedSymbol(value) {
-    switch (value & (this.isDeterminedBit | this.symbolBits)) {
-      case this.isDeterminedBit | 0x1:
+    switch (value & (Calc.isDeterminedBit | Calc.symbolBits)) {
+      case Calc.isDeterminedBit | 0x1:
         return 1;
-      case this.isDeterminedBit | 0x2:
+      case Calc.isDeterminedBit | 0x2:
         return 2;
-      case this.isDeterminedBit | 0x4:
+      case Calc.isDeterminedBit | 0x4:
         return 3;
-      case this.isDeterminedBit | 0x8:
+      case Calc.isDeterminedBit | 0x8:
         return 4;
-      case this.isDeterminedBit | 0x10:
+      case Calc.isDeterminedBit | 0x10:
         return 5;
-      case this.isDeterminedBit | 0x20:
+      case Calc.isDeterminedBit | 0x20:
         return 6;
-      case this.isDeterminedBit | 0x40:
+      case Calc.isDeterminedBit | 0x40:
         return 7;
-      case this.isDeterminedBit | 0x80:
+      case Calc.isDeterminedBit | 0x80:
         return 8;
-      case this.isDeterminedBit | 0x100:
+      case Calc.isDeterminedBit | 0x100:
         return 9;
       default:
         return "";
@@ -245,31 +245,41 @@ export class Calc {
   static getNSymbolSquares(wb, n) {
     const result = [];
     for (var i = 0; i < wb.length; i++) {
-      if (this.symbolCount(wb[i]) === n) result.push(i);
+      if (Calc.symbolCount(wb[i]) === n) result.push(i);
     }
     return result;
   }
   static unreduceNonDetermined(board) {
     for (var i = 0; i < board.length; i++) {
-      if ((board[i] & this.isDeterminedBit) === 0) {
-        board[i] |= this.symbolBits;
+      if ((board[i] & Calc.isDeterminedBit) === 0) {
+        board[i] |= Calc.symbolBits;
       }
     }
   }
+  static unreduceNonEdited(board) {
+    for (var i = 0; i < board.length; i++) {
+      if ((board[i] & (Calc.isUserEditedBit | Calc.isDeterminedBit)) === 0) {
+        board[i] |= Calc.symbolBits;
+      }
+    }
+  }
+
   static transformToWorkBoard(board) {
     //Keep only symbolbits
     for (var i = 0; i < board.length; i++) {
-      if ((board[i] & this.isDeterminedBit) !== 0) {
-        board[i] &= this.symbolBits;
+      if ((board[i] & (Calc.isDeterminedBit | Calc.isFixedBit)) !== 0) {
+        board[i] &= Calc.symbolBits;
       } else {
-        board[i] = this.symbolBits;
+        board[i] = Calc.symbolBits;
       }
     }
   }
   static definedGame(board) {
     for (var i = 0; i < board.length; i++) {
       if (Calc.symbolCount(board[i]) === 1) {
-        board[i] |= Calc.isFixedBit;
+        board[i] |= Calc.isFixedBit | Calc.isDeterminedBit;
+      } else {
+        board[i] = Calc.symbolBits;
       }
     }
   }
@@ -327,7 +337,7 @@ export class Calc {
     let nrReduced = 0;
     for (var g = 0; g < Calc.grpIx.length; g++) {
       var gx = Calc.grpIx[g];
-      var determined = this.getDeterminedInGrp(board, gx);
+      var determined = Calc.getDeterminedInGrp(board, gx);
       if (determined !== 0) {
         nrReduced += Calc.reduceNonSolved(board, gx, determined, false);
       }
@@ -363,7 +373,7 @@ export class Calc {
   }
   static reduceFromSquare(board, ix) {
     let nrSquaresReduced = 0;
-    //const invBits = ~(board[ix] & this.symbolBits);
+    //const invBits = ~(board[ix] & Calc.symbolBits);
     const grps = Calc.groupsOfSquare(ix);
     grps.forEach(gx => (nrSquaresReduced += Calc.reduceNonSolved(board, gx, board[ix] & Calc.symbolBits)));
     return nrSquaresReduced;
@@ -371,7 +381,7 @@ export class Calc {
   // static reduceFromDecidedSquare(wb, ix, reduced) {
   //   const solvedSym = wb[ix];
   //   const invSolvedSym = ~solvedSym;
-  //   const grps = this.groupsOfSquare(ix);
+  //   const grps = Calc.groupsOfSquare(ix);
 
   //   for (var g = 0; g < grps.length; g++) {
   //     for (var m = 0; m < grps[g].length; m++) {
@@ -390,7 +400,7 @@ export class Calc {
   // }
 
   static groupsOfSquare(sq) {
-    return this.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq];
+    return Calc.groupBelongingOfSquares_UsedBy_groupsOfSquare[sq];
   }
 
   static squareBitsOfSymbol(board, gx, symbolBit) {
@@ -439,12 +449,12 @@ export class Calc {
   static reduceGroup(board, gx, n) {}
 
   //Only 1 symbol in 1 square. Reduce that symbol from rest of group
-  static reduceGroup1(wb, gx, doForSymbolsBits = this.symbolBits) {
+  static reduceGroup1(wb, gx, doForSymbolsBits = Calc.symbolBits) {
     let nrReduced = 0;
     let symbolBit = 1;
     let doAgainBits = 0;
 
-    for (let s = 0; s < this.nrSymbols; s++, symbolBit <<= 1) {
+    for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
       if ((doForSymbolsBits & symbolBit) === 0) continue;
       for (let g = 0; g < gx.length; g++) {
         if (wb[gx[g]] === symbolBit) {
@@ -454,7 +464,7 @@ export class Calc {
             if ((wb[gx[g2]] & symbolBit) !== 0) {
               wb[gx[g2]] &= invSymbolBit;
               nrReduced++;
-              if (this.symbolCount(wb[gx[g2]]) === 1 && wb[gx[g2]] < symbolBit) {
+              if (Calc.symbolCount(wb[gx[g2]]) === 1 && wb[gx[g2]] < symbolBit) {
                 //Got another single-bit-square (less than current), do again for this symbol-bit later
                 doAgainBits |= wb[gx[g2]];
               }
@@ -464,18 +474,18 @@ export class Calc {
       }
     }
     if (doAgainBits !== 0) {
-      nrReduced += this.reduceGroup1(wb, gx, doAgainBits);
+      nrReduced += Calc.reduceGroup1(wb, gx, doAgainBits);
     }
     return nrReduced;
   }
 
   //1 symbol in only 1 square. Reduce other symbols from that square
-  static reduceSquares1(wb, gx, doForSymbolsBits = this.symbolBits) {
+  static reduceSquares1(wb, gx, doForSymbolsBits = Calc.symbolBits) {
     let nrReducedSquares = 0;
     let symbolBit = 1;
-    for (let s = 0; s < this.nrSymbols; s++, symbolBit <<= 1) {
+    for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) === 0) continue;
-      const sqIx = this.singleSquaresOfSymbol(wb, gx, symbolBit);
+      const sqIx = Calc.singleSquaresOfSymbol(wb, gx, symbolBit);
       if (sqIx >= 0) {
         wb[sqIx] = symbolBit;
         nrReducedSquares++;
@@ -487,7 +497,7 @@ export class Calc {
   static removeSolvedSquares(wb, gx) {
     let solvedBits = 0;
     gx = gx.reduce((res, ix) => {
-      if (this.symbolCount(wb[ix]) > 1) {
+      if (Calc.symbolCount(wb[ix]) > 1) {
         res.push(ix);
       } else {
         solvedBits |= wb[ix];
@@ -500,23 +510,23 @@ export class Calc {
   //Only 2 symbols in 2 square. Reduce those symbols from rest of group...
   //...and 2 symbols only in 2 squares. Reduce other symbols from those squares.
   //Assumes 1 reduced before
-  static reduceGroupsAndSquares2(wb, gx, doForSymbolsBits = this.symbolBits) {
+  static reduceGroupsAndSquares2(wb, gx, doForSymbolsBits = Calc.symbolBits) {
     let solvedBits;
-    [gx, solvedBits] = this.removeSolvedSquares(wb, gx);
+    [gx, solvedBits] = Calc.removeSolvedSquares(wb, gx);
     doForSymbolsBits &= ~solvedBits;
 
-    const sqixOfSym = Array(this.nrSymbols);
+    const sqixOfSym = Array(Calc.nrSymbols);
     let symbolBit = 1;
-    for (let s = 0; s < this.nrSymbols; s++, symbolBit <<= 1) {
+    for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) === 0) continue;
-      sqixOfSym[s] = this.squareBitsOfSymbol(wb, gx, symbolBit);
+      sqixOfSym[s] = Calc.squareBitsOfSymbol(wb, gx, symbolBit);
     }
 
     symbolBit = 1;
-    for (let s1 = 0; s1 < this.nrSymbols; s1++, symbolBit <<= 1) {
+    for (let s1 = 0; s1 < Calc.nrSymbols; s1++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) !== 0) continue;
       let symbolBit2 = 1;
-      for (let s2 = 0; s2 < this.nrSymbols; s2++, symbolBit2 <<= 1) {
+      for (let s2 = 0; s2 < Calc.nrSymbols; s2++, symbolBit2 <<= 1) {
         if ((symbolBit & doForSymbolsBits) !== 0 || s1 === s2) continue;
 
         const combSymBits = symbolBit | symbolBit2;
@@ -539,9 +549,9 @@ export class Calc {
 
         if (
           sqixOfSym[s1] === sqixOfSym[s2] &&
-          this.symbolCount(sqixOfSym[s1]) === 2 /*this.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
+          Calc.symbolCount(sqixOfSym[s1]) === 2 /*Calc.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
         ) {
-          const gIxs = this.bitIxs(sqixOfSym[s1]);
+          const gIxs = Calc.bitIxs(sqixOfSym[s1]);
           gIxs.forEach(gIx => (wb[gx[gIx]] &= combSymBits));
           return true;
         }
@@ -552,16 +562,16 @@ export class Calc {
 
   //Only 2 symbols in 2 square. Reduce those symbols from rest of group.
   //Assumes 1 reduced before
-  static reduceGroups2(wb, gx, doForSymbolsBits = this.symbolBits) {
+  static reduceGroups2(wb, gx, doForSymbolsBits = Calc.symbolBits) {
     let solvedBits;
-    [gx, solvedBits] = this.removeSolvedSquares(wb, gx);
+    [gx, solvedBits] = Calc.removeSolvedSquares(wb, gx);
     doForSymbolsBits &= ~solvedBits;
 
     let symbolBit = 1;
-    for (let s1 = 0; s1 < this.nrSymbols - 1; s1++, symbolBit <<= 1) {
+    for (let s1 = 0; s1 < Calc.nrSymbols - 1; s1++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) !== 0) continue;
       let symbolBit2 = symbolBit << 1;
-      for (let s2 = s1 + 1; s2 < this.nrSymbols; s2++, symbolBit2 <<= 1) {
+      for (let s2 = s1 + 1; s2 < Calc.nrSymbols; s2++, symbolBit2 <<= 1) {
         if ((symbolBit & doForSymbolsBits) !== 0) continue;
 
         const combSymBits = symbolBit | symbolBit2;
@@ -597,32 +607,32 @@ export class Calc {
 
   //2 symbols only in 2 squares. Reduce other symbols from those squares.
   //Assumes 1 reduced before
-  static reduceSquares2(wb, gx, doForSymbolsBits = this.symbolBits) {
+  static reduceSquares2(wb, gx, doForSymbolsBits = Calc.symbolBits) {
     let solvedBits;
-    [gx, solvedBits] = this.removeSolvedSquares(wb, gx);
+    [gx, solvedBits] = Calc.removeSolvedSquares(wb, gx);
     doForSymbolsBits &= ~solvedBits;
 
-    const sqixOfSym = Array(this.nrSymbols);
+    const sqixOfSym = Array(Calc.nrSymbols);
     let symbolBit = 1;
-    for (let s = 0; s < this.nrSymbols; s++, symbolBit <<= 1) {
+    for (let s = 0; s < Calc.nrSymbols; s++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) === 0) continue;
-      sqixOfSym[s] = this.squareBitsOfSymbol(wb, gx, symbolBit);
+      sqixOfSym[s] = Calc.squareBitsOfSymbol(wb, gx, symbolBit);
     }
 
     symbolBit = 1;
-    for (let s1 = 0; s1 < this.nrSymbols - 1; s1++, symbolBit <<= 1) {
+    for (let s1 = 0; s1 < Calc.nrSymbols - 1; s1++, symbolBit <<= 1) {
       if ((symbolBit & doForSymbolsBits) !== 0) continue;
       let symbolBit2 = symbolBit << 1;
-      for (let s2 = s1 + 1; s2 < this.nrSymbols; s2++, symbolBit2 <<= 1) {
+      for (let s2 = s1 + 1; s2 < Calc.nrSymbols; s2++, symbolBit2 <<= 1) {
         if ((symbolBit2 & doForSymbolsBits) !== 0) continue;
 
         const combSymBits = symbolBit | symbolBit2;
 
         if (
           sqixOfSym[s1] === sqixOfSym[s2] &&
-          this.symbolCount(sqixOfSym[s1]) === 2 /*this.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
+          Calc.symbolCount(sqixOfSym[s1]) === 2 /*Calc.bitCount(sqixOfSym[s1] | sqixOfSym[s2]) === 2*/
         ) {
-          const gIxs = this.bitIxs(sqixOfSym[s1]);
+          const gIxs = Calc.bitIxs(sqixOfSym[s1]);
           gIxs.forEach(gIx => (wb[gx[gIx]] &= combSymBits));
           return true;
         }
@@ -631,43 +641,43 @@ export class Calc {
     return false;
   }
   // static generateRandomBoard() {
-  //   const board = Array(this.nrSymbols * this.nrSymbols).fill(this.symbolBits);
+  //   const board = Array(Calc.nrSymbols * Calc.nrSymbols).fill(Calc.symbolBits);
   //   const undecided = Array(board.length);
   //   for (var i = 0; i < board.length; i++) {
   //     undecided[i] = i;
   //   }
-  //   this.glbCounter = 0;
-  //   const ok = this.solveRandom(board, undecided);
+  //   Calc.glbCounter = 0;
+  //   const ok = Calc.solveRandom(board, undecided);
   //   console.log(ok, board.length, board);
   //   return board;
   // }
 
   static generateRandomBoard() {
-    const board = Array(this.nrSquares).fill(this.symbolBits);
-    this.glbCounter = 0;
-    const ok = this.solveRandom2(board, 0);
+    const board = Array(Calc.nrSquares).fill(Calc.symbolBits);
+    Calc.glbCounter = 0;
+    const ok = Calc.solveRandom2(board, 0);
     console.log("generateRandomBoard()=>", ok, board.length, board);
     return board;
   }
 
   static solveRandom2(board, sqIx) {
-    this.glbCounter++;
-    if (sqIx === 0) this.highLevel = 0;
+    Calc.glbCounter++;
+    if (sqIx === 0) Calc.highLevel = 0;
 
     const origSq = board[sqIx];
-    const candidateSyms = this.getSymbols(origSq);
-    this.shuffle(candidateSyms);
+    const candidateSyms = Calc.getSymbols(origSq);
+    Calc.shuffle(candidateSyms);
 
-    if (sqIx > this.highLevel) {
-      this.highLevel = sqIx;
-      //console.log("Square", sqIx, this.glbCounter, origSq, candidateSyms, board);
+    if (sqIx > Calc.highLevel) {
+      Calc.highLevel = sqIx;
+      //console.log("Square", sqIx, Calc.glbCounter, origSq, candidateSyms, board);
     }
 
     const reduced = [];
     for (var candSym of candidateSyms) {
       board[sqIx] = candSym;
-      if (this.reduceFromDecidedSquare_OnlyHigherSquares(board, sqIx, reduced)) {
-        if (sqIx + 1 === board.length || this.solveRandom2(board, sqIx + 1)) {
+      if (Calc.reduceFromDecidedSquare_OnlyHigherSquares(board, sqIx, reduced)) {
+        if (sqIx + 1 === board.length || Calc.solveRandom2(board, sqIx + 1)) {
           return true;
         }
       }
@@ -683,7 +693,7 @@ export class Calc {
   static reduceFromDecidedSquare_OnlyHigherSquares(wb, ix, reduced) {
     const solvedSym = wb[ix];
     const invSolvedSym = ~solvedSym;
-    const grps = this.groupsOfSquare(ix);
+    const grps = Calc.groupsOfSquare(ix);
 
     for (var g = 0; g < grps.length; g++) {
       for (var m = 0; m < grps[g].length; m++) {
@@ -705,8 +715,8 @@ export class Calc {
   static glbCounter = 0;
   static highLevel;
   // static solveRandom(board, undecided, level = 0) {
-  //   this.glbCounter++;
-  //   if (level === 0) this.highLevel = 0;
+  //   Calc.glbCounter++;
+  //   if (level === 0) Calc.highLevel = 0;
   //   if (level + undecided.length != 81) {
   //     console.log("LEVELERROR", level, undecided.length);
   //     return false;
@@ -726,24 +736,24 @@ export class Calc {
   //   restUndecided.splice(undecidedIndex, 1);
   //   const origSq = board[undecidedBoardIx];
   //   const reduced = [];
-  //   const candidateSyms = this.getSymbols(origSq);
-  //   this.shuffle(candidateSyms);
+  //   const candidateSyms = Calc.getSymbols(origSq);
+  //   Calc.shuffle(candidateSyms);
 
-  //   if (level > this.highLevel) {
-  //     this.highLevel = level;
-  //     console.log("Level", level, this.glbCounter, undecidedBoardIx, origSq, candidateSyms, board);
+  //   if (level > Calc.highLevel) {
+  //     Calc.highLevel = level;
+  //     console.log("Level", level, Calc.glbCounter, undecidedBoardIx, origSq, candidateSyms, board);
   //   }
 
   //   //console.log(level, undecidedIndex, undecidedBoardIx, candidateSyms, undecided, restUndecided);
 
   //   for (var candSym of candidateSyms) {
   //     board[undecidedBoardIx] = candSym;
-  //     if (this.reduceFromDecidedSquare(board, undecidedBoardIx, reduced)) {
+  //     if (Calc.reduceFromDecidedSquare(board, undecidedBoardIx, reduced)) {
   //       if (restUndecided.length === 0) {
   //         console.log("TRUE-2", level);
   //         return true;
   //       }
-  //       if (this.solveRandom(board, restUndecided, level + 1)) {
+  //       if (Calc.solveRandom(board, restUndecided, level + 1)) {
   //         console.log("TRUE-3", level);
   //         /*Found good board*/
   //         return true;
@@ -811,7 +821,7 @@ export class Calc {
     if (!Array.isArray(ary)) return ary;
     const cp = Array(ary.length);
     for (let i = 0; i < ary.length; i++) {
-      cp[i] = this.deepCopy(ary[i]);
+      cp[i] = Calc.deepCopy(ary[i]);
     }
   }
 }

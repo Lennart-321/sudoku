@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: 3fr 1fr;
   align-items: end;
+  margin-top: 2rem;
 }
 .head-info {
   display: flex;
@@ -36,7 +37,7 @@
   position: absolute;
   font-size: 1.2rem;
   background-color: #f1f1f1;
-  min-width: 12rem;
+  min-width: 15rem;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   cursor: pointer;

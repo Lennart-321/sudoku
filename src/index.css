@@ -8,6 +8,7 @@ body {
   /* background-color: #eee; */
 
   --fontSize: 10px;
+  --fontFamily: Verdana, "Segoe UI", Tahoma, Geneva, sans-serif;
   /* tot cell mrg = 6*bigmrg + 12*smlmrg  */
   --bigmrg: 0.2rem;
   --smlmrg: 0.075rem;
@@ -18,7 +19,7 @@ body {
 
   font-size: var(--fontSize);
 
-  font-family: Verdana, "Segoe UI", Tahoma, Geneva, sans-serif;
+  font-family: var(--fontFamily);
   /* font-family: "Wingdings"; */
   /* font-family: Arial, Helvetica, sans-serif; */
   /* font-family: "Comic Sans", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; */

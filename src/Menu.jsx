@@ -55,7 +55,7 @@ export function Menu({ refresh }) {
               New Random
             </a>
             <a className="menu-alt" onClick={() => newGame(-1)}>
-              {Sudoku.isDefineGameState ? "Ready - Start my Game" : "Define Game"}
+              {Sudoku.isDefineGameState ? "Start my game" : "Define Game"}
             </a>
             <a className="menu-alt" onClick={() => newGame(-2)}>
               Restart
@@ -73,6 +73,8 @@ export function Menu({ refresh }) {
             {onOffMenuItem("Show edited only", Settings.showOnlyEditedHelp, Settings.toggleShowEditedOnly)}
             {onOffMenuItem("Auto-reduce", Settings.autoReduceHelpSymbols, Settings.toggleAutoReduceHelpSymbols)}
             <a className="menu-alt" onClick={() => { if (Sudoku.autoReduceOnce()) refresh(); }}>Auto-reduce once</a>
+            <a className="menu-alt" onClick={() => { if (Sudoku.restoreHelpSymbols()) refresh(); }}>Restore all support</a>
+            <a className="menu-alt" onClick={() => { if (Sudoku.restoreNonEdited()) refresh(); }}>Restore non edited</a>
             <a className="menu-alt" onClick={() => solveGame()}>Solve game</a>
             {onOffMenuItem("Show errors", Settings.showErrors, Settings.toggleShowErrors)}
           </div>

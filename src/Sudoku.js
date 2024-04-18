@@ -210,11 +210,21 @@ export class Sudoku {
     const nrRed = Calc.simpleReduceFromDetermined(Sudoku.currentGame.board);
     return nrRed > 0;
   }
+  static restoreHelpSymbols() {
+    Calc.unreduceNonDetermined(Sudoku.currentGame.board);
+    return true;
+  }
+  static restoreNonEdited() {
+    Calc.unreduceNonEdited(Sudoku.currentGame.board);
+    return true;
+  }
+
   static showSudokuInfo() {
     Sudoku.importantMessage &&
       Sudoku.importantMessage(
         [
           //"SUDOKU by Lennart",
+          "Click on choosen symbol to delete.",
           "Use Ctrl + click to keep support symbol.",
           "Use Ctrl + click to focus on more than one symbol.",
         ],

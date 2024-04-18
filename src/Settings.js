@@ -51,6 +51,7 @@ export class Settings {
     } else {
       Settings.showAllHelp = true;
       Settings.showHelpSymbols = true;
+      Settings.showOnlyEditedHelp = false;
     }
     //Sudoku.updateMenu();
   }
@@ -61,7 +62,8 @@ export class Settings {
     } else {
       Settings.autoReduceHelpSymbols = true;
       Settings.showHelpSymbols = true;
-      Calc.simpleReduceFromFixed(Sudoku.currentGame.board);
+      Calc.simpleReduceFromDetermined(Sudoku.currentGame.board);
+      //Calc.simpleReduceFromFixed(Sudoku.currentGame.board);
     }
     //Sudoku.updateMenu();
   }
