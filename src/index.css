@@ -1,6 +1,7 @@
 body {
+  --appBkg: lightgray;
   margin: 0;
-  background-color: lightgrey;
+  background-color: var(--appBkg);
 }
 :root {
   position: relative;

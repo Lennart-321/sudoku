@@ -8,6 +8,9 @@ import { Sudoku } from "./Sudoku.js";
 //let counter = 0;
 //prettier-ignore
 const symbols = Array(Calc.nrSymbols).fill(0).map((_, ix) => ix + 1);
+const symbolBitArray = Array(Calc.nrSymbols)
+  .fill(0)
+  .map((_, ix) => Calc.getSymbolBit(ix + 1));
 export default function Cell({ index, boardChanged }) {
   const [updateCount, refreshCell] = useState(0);
 
@@ -42,32 +45,32 @@ export default function Cell({ index, boardChanged }) {
             "empty"; //"symbol-menu";
 
   const determinedSymbol = Calc.determinedSymbol(value);
+  const noFoc = isDetermined && Sudoku.isSymbolBitOutOfFocus(value & Calc.symbolBits) ? "out-of-focus" : "";
 
-  // prettier-ignore
-  console.log(index, mode, "help=", showHelpSymbols, "red=", isReduced, "sel=", isSelected, "det=", isDetermined, "fix=", isFixed, "err=", showWrong);
+  // // prettier-ignore
+  // console.log(index, mode, "help=", showHelpSymbols, "red=", isReduced, "sel=", isSelected, "det=", isDetermined, "fix=", isFixed, "err=", showWrong);
 
-  const determined = (
+  const content = isDetermined ? (
     <span
-      className="determined-symbol"
+      className={`determined-symbol ${noFoc}`}
       onClick={() => {
         if (Sudoku.deleteDeterminedSquare(index)) refreshCell(c => c + 1);
       }}
     >
       {determinedSymbol}
     </span>
-  );
-  const helpAndMenu = (
+  ) : (
     <div className="help-grid">
       {symbols.map(s => (
         <div
           key={s}
           className={`help-symbol ${
             isReduced && Settings.showHelpSymbols
-              ? (value & Calc.getSymbolBit(s)) === 0
+              ? (value & symbolBitArray[s - 1]) === 0
                 ? "reduced"
                 : "candidate"
               : ""
-          }`}
+          } ${Sudoku.isSymbolBitOutOfFocus(symbolBitArray[s - 1]) ? "out-of-focus" : ""}`}
           onClick={e => {
             let [newValue, thisCellChanged, otherCellChanged] = Sudoku.helpSymbolCommand(
               e.altKey | e.ctrlKey | e.shiftKey,
@@ -83,11 +86,15 @@ export default function Cell({ index, boardChanged }) {
       ))}
     </div>
   );
+
   return (
-    <div className={`cell h${index % 3} v${Math.floor(index / 9) % 3} ${mode} val${value}`}>
-      {isDetermined ? determined : helpAndMenu}
+    <div
+      className={`cell h${index % 3} v${Math.floor(index / 9) % 3} ${mode} ${noFoc ? "out-of-focus" : ""} val${value}`}
+    >
+      {content}
     </div>
   );
+  //{isDetermined ? determined : helpAndMenu}
 }
 
 // function handleHelpSymbolClick(alt, symbol, value) {

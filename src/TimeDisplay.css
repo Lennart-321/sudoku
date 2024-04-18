@@ -1,0 +1,11 @@
+#time-display {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 0.3rem 0.5rem 0rem 0.5rem;
+  background-color: #eee;
+  color: #555;
+  /* margin-top: 0.5rem; */
+  margin-bottom: 0.5rem;
+  margin-right: 0.2rem;
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import Board from "./Board.jsx";
 import { Menu } from "./Menu.jsx";
 import { Message } from "./Message.jsx";
+import { Sudoku } from "./Sudoku.js";
 import "./App.css";
 
 //const glbDefaultGame = new Game();
@@ -10,6 +11,7 @@ function App() {
   const refresh = function () {
     setUpdateCount(c => c + 1);
   };
+  Sudoku.refreshApp = refresh;
   //const [game, setGame] = useState(null); // useState(glbDefaultGame);
   // if (!game) {
   //   setGame(new Game());

@@ -80,6 +80,10 @@
 .cell.wrong {
   color: #c00;
 }
+.cell.out-of-focus {
+  background-color: #ccc;
+  color: #bbb;
+}
 
 .help-symbol {
   width: var(--helpSz);
@@ -94,6 +98,9 @@
 .help-symbol.candidate {
   font-weight: bolder;
   font-size: 1.2rem;
+}
+.help-symbol.candidate.out-of-focus {
+  color: #eee;
 }
 
 /* .cell.symbol-menu:hover > .determined-symbol {
@@ -114,6 +121,9 @@
   /* background-color: white; */
   /* font-weight: bold; */
 }
+/* .determined-symbol.out-of-focus {
+  color: #eee;
+} */
 
 .h0.v0 {
   margin: var(--bigmrg) var(--smlmrg) var(--smlmrg) var(--bigmrg);

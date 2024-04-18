@@ -1,7 +1,8 @@
 import { useState } from "react";
-import "./Board.css";
 import Cell from "./Cell.jsx";
+import { Focus } from "./Focus.jsx";
 import { Sudoku } from "./Sudoku.js";
+import "./Board.css";
 
 export default function Board() {
   const [updateCount, setUpdateCount] = useState(0);
@@ -9,7 +10,7 @@ export default function Board() {
   console.log("Board update count:", updateCount);
 
   if (!Sudoku.currentGame) {
-    Sudoku.createDefaultGame();
+    setTimeout(Sudoku.createDefaultGame, 0);
   }
 
   return (
@@ -19,6 +20,7 @@ export default function Board() {
           <Cell key={ix} index={ix} boardChanged={setUpdateCount} />
         ))}
       </div>
+      <Focus />
     </>
   );
 }

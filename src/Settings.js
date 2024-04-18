@@ -7,7 +7,23 @@ export class Settings {
   static showAllHelp = false; //true => show all help symbols always
   static autoReduceHelpSymbols = false;
   static showErrors = false;
+  static showFocusButtons = false;
+  static showTime = true;
 
+  static toggleShowTime() {
+    Settings.showTime = !Settings.showTime;
+    Sudoku.updateTimeDisplay && Sudoku.updateTimeDisplay();
+  }
+
+  static toggleShowFocusButtons() {
+    if (Settings.showFocusButtons) {
+      Settings.showFocusButtons = false;
+      Sudoku.focusSymbols = 0;
+    } else {
+      Settings.showFocusButtons = true;
+    }
+    Sudoku.refreshApp && Sudoku.refreshApp();
+  }
   static toggleShowHelpSymbols() {
     if (Settings.showHelpSymbols) {
       Settings.showHelpSymbols = false;

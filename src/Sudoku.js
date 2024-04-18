@@ -7,10 +7,44 @@ export class Sudoku {
   static currentGame;
   static isDefineGameState = false;
   static focusSymbols = 0;
+  //Component methods:
+  static refreshApp = null;
   static importantMessage = null;
   static updateMenu = null;
+  static updateTimeDisplay = null;
 
   constructor() {}
+
+  static isSymbolBitOutOfFocus(symbolBit) {
+    return Sudoku.focusSymbols && (Sudoku.focusSymbols & symbolBit) === 0;
+  }
+  static isSymbolValOutOfFocus(symbolVal) {
+    return Sudoku.focusSymbols && (Sudoku.focusSymbols & symbolVal) === 0;
+  }
+  static isInFocus(symbolIx) {
+    return (Sudoku.focusSymbols & Calc.getSymbolBit(symbolIx + 1)) !== 0;
+  }
+  static toggleFocus(symbolIx, altCmd) {
+    const preFocus = Sudoku.focusSymbols;
+    const symbolBit = Calc.getSymbolBit(symbolIx + 1);
+
+    if (Sudoku.isInFocus(symbolIx)) {
+      if (altCmd) {
+        Sudoku.focusSymbols &= ~symbolBit;
+      } else {
+        Sudoku.focusSymbols = 0;
+      }
+    } else {
+      if (altCmd) {
+        Sudoku.focusSymbols |= symbolBit;
+      } else {
+        Sudoku.focusSymbols = symbolBit;
+      }
+    }
+    const changed = Sudoku.focusSymbols !== preFocus;
+    if (changed) Sudoku.refreshApp && Sudoku.refreshApp();
+    return Sudoku.focusSymbols !== preFocus;
+  }
 
   static helpSymbolCommand(altCmd, symbolValue, index /*, currentSquareValue Curret Square Value*/) {
     const symbolBit = Calc.getSymbolBit(symbolValue);
@@ -58,16 +92,16 @@ export class Sudoku {
   }
 
   //static twodig(num) { return (num < 10 ? "0" : "") + num; }
-  static formatDuration(seconds) {
+  static formatDuration(seconds, showSecondsPostfix = false) {
     const secs = seconds % 60;
-    let mins = Math.floor(seconds / 60);
-    if (mins === 0) return secs + " seconds";
+    const mins = Math.floor(seconds / 60);
+    if (showSecondsPostfix && mins === 0) return secs + " seconds";
 
     const two = n => (n < 10 ? "0" : "") + n;
-    if (mins < 60) return `${mins}:${two(secs)}`;
+    if (mins < 60) return `${two(mins)}:${two(secs)}`;
 
     const hours = Math.floor(seconds / 3600);
-    return `${hours}:${two(mins % 60)}:${two(secs)}`;
+    return `${two(hours)}:${two(mins % 60)}:${two(secs)}`;
   }
 
   static gameSolvedTest() {
@@ -78,7 +112,7 @@ export class Sudoku {
       let duration = Math.floor((Sudoku.currentGame.solvedTime - Sudoku.currentGame.startTime) / 1000);
 
       Sudoku.importantMessage &&
-        Sudoku.importantMessage(["Solved!", "Time: " + Sudoku.formatDuration(duration)], "#0A0", 30);
+        Sudoku.importantMessage(["Solved!", "Time: " + Sudoku.formatDuration(duration, true)], "#0A0", 30);
     }
     return solved;
   }
@@ -90,7 +124,10 @@ export class Sudoku {
       value &= ~Calc.isDeterminedBit;
       value |= Calc.symbolBits;
       Sudoku.currentGame.board[index] = value;
-      Sudoku.currentGame.isSolved = false;
+      if (Sudoku.currentGame.isSolved) {
+        Sudoku.currentGame.isSolved = false;
+        Sudoku.updateTimeDisplay && Sudoku.updateTimeDisplay();
+      }
     }
     return v0 !== value;
   }
@@ -110,6 +147,9 @@ export class Sudoku {
     ];
     Calc.twistAndTurn(hardBoard);
     Sudoku.currentGame = new Game(hardBoard);
+    //TimeDisplay.jsx:9 Warning: Cannot update a component (`TimeDisplay`) while rendering a different component (`Board`). To locate the bad setState() call inside `Board`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render
+    //Sudoku.updateTimeDisplay();
+    Sudoku.refreshApp && Sudoku.refreshApp();
   }
 
   static createNewGame(level) {
@@ -150,6 +190,7 @@ export class Sudoku {
       Sudoku.currentGame.isSolved = false;
     } else if (level === -1) {
       Sudoku.currentGame = new Game(Array(Calc.nrSquares).fill(Calc.symbolBits));
+      Sudoku.currentGame.startTime = null;
       Sudoku.isDefineGameState = true;
       needInitialReduce = false;
     }
@@ -158,6 +199,7 @@ export class Sudoku {
       Calc.simpleReduceFromFixed(Sudoku.currentGame.board);
     }
   }
+
   static assureWrongTestsPossible() {
     const preSolutionType = Sudoku.currentGame.targetStatus;
     const newSolutionType = Sudoku.currentGame.solutionType();

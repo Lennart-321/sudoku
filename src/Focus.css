@@ -1,0 +1,26 @@
+#focus-bar {
+  width: var(--boardSz);
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  background-color: var(--appBkg);
+}
+.focus-button {
+  width: 3rem;
+  height: 3rem;
+  font-size: 2rem;
+  background-color: #ddd;
+  color: #bbb;
+  border: none;
+  border-radius: 0.2rem;
+}
+.focus-button:hover {
+  background-color: #eee;
+  color: #999;
+}
+.focus-button.infocus {
+  background-color: #fafafa;
+  color: #333;
+}

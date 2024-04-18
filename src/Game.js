@@ -36,4 +36,7 @@ export class Game {
   solutionType() {
     return Calc.solutionType(this);
   }
+  // isPlaying() {
+  //   return !this.isSolved && !!this.startTime;
+  // }
 }
