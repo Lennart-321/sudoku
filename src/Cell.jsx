@@ -90,7 +90,9 @@ export default function Cell({ index, boardChanged }) {
 
   return (
     <div
-      className={`cell h${index % 3} v${Math.floor(index / 9) % 3} ${mode} ${noFoc ? "out-of-focus" : ""} val${value}`}
+      className={`cell col${index % 9} row${Math.floor(index / 9)} h${index % 3} v${
+        Math.floor(index / 9) % 3
+      } ${mode} ${noFoc ? "out-of-focus" : ""} val${value}`}
     >
       {content}
     </div>

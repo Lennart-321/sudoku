@@ -3,13 +3,25 @@
   height: var(--boardSz);
 
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(9, 1fr);
+  /* grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr); */
+
+  /* grid-template-columns: 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr;
+  grid-template-rows: 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr; */
+
+  /*prettier-ignore*/
+  grid-template-columns: var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+   var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+   var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz);
+  /*prettier-ignore*/
+  grid-template-rows:    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz);
 
   /* background-color: rgba(0, 0, 0, 0.5); */
   background-color: gray;
   border: var(--boardBorder) gray solid;
-  border-radius: 0.1rem;
+  border-radius: 0.2rem;
   margin: 0;
   padding: 0;
 }

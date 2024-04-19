@@ -84,7 +84,62 @@
 
 /*** Cell margins - for displaing sudoku grid ***/
 
-.h0.v0 {
+.col0 {
+  grid-column-start: 1;
+}
+.col1 {
+  grid-column-start: 3;
+}
+.col2 {
+  grid-column-start: 5;
+}
+.col3 {
+  grid-column-start: 7;
+}
+.col4 {
+  grid-column-start: 9;
+}
+.col5 {
+  grid-column-start: 11;
+}
+.col6 {
+  grid-column-start: 13;
+}
+.col7 {
+  grid-column-start: 15;
+}
+.col8 {
+  grid-column-start: 17;
+}
+.row0 {
+  grid-row-start: 1;
+}
+.row1 {
+  grid-row-start: 3;
+}
+.row2 {
+  grid-row-start: 5;
+}
+.row3 {
+  grid-row-start: 7;
+}
+.row4 {
+  grid-row-start: 9;
+}
+.row5 {
+  grid-row-start: 11;
+}
+.row6 {
+  grid-row-start: 13;
+}
+.row7 {
+  grid-row-start: 15;
+}
+.row8 {
+  grid-row-start: 17;
+}
+
+/* .h0.v0 {
   margin: var(--bigmrg) var(--smlmrg) var(--smlmrg) var(--bigmrg);
 }
 .h0.v1 {
@@ -112,4 +167,4 @@
 }
 .h2.v2 {
   margin: var(--smlmrg) var(--bigmrg) var(--bigmrg) var(--smlmrg);
-}
+} */

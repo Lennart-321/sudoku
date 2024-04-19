@@ -9,12 +9,21 @@ body {
 
   --fontSize: 10px;
   --fontFamily: Verdana, "Segoe UI", Tahoma, Geneva, sans-serif;
+
+  --lineSz: 0.14rem;
+  --bigLineSz: 0.35em;
+  --cellSz: 6rem;
+  --boardSz: calc(9 * var(--cellSz) + 2 * var(--bigLineSz) + 6 * var(--lineSz));
+  --boardBorder: calc(1.2 * var(--bigLineSz));
+
   /* tot cell mrg = 6*bigmrg + 12*smlmrg  */
   --bigmrg: 0.2rem;
   --smlmrg: 0.075rem;
-  --boardBorder: 0.3rem;
-  --boardSz: 54rem;
-  --cellSz: calc((var(--boardSz) - 6 * var(--bigmrg) - 12 * var(--smlmrg)) / 9);
+  /* --boardBorder: 0.3rem; */
+  /* --boardSz: 54rem;
+  --cellSz: calc((var(--boardSz) - 6 * var(--bigmrg) - 12 * var(--smlmrg)) / 9); */
+  /* --boardSz: 57rem;
+  --cellSz: 6rem; */
   --helpSz: calc(var(--cellSz) / 3);
 
   font-size: var(--fontSize);
