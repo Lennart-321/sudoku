@@ -25,7 +25,7 @@ export function Menu({ refresh }) {
   // prettier-ignore
   const onOffMenuItem = function (text, setting, settingsMethod) {
     return (
-      <a className="menu-alt" onClick={() => { settingsMethod(); refresh(); console.log(Settings.showHelpSymbols, Settings.showAllHelp, Settings.showOnlyEditedHelp); }}>
+      <a className="menu-alt" onClick={() => { settingsMethod(); refresh(); /*console.log(Settings.showHelpSymbols, Settings.showAllHelp, Settings.showOnlyEditedHelp);*/ }}>
         <span className={setting ? "setting-on" : "setting-off"}></span>
         {/* <span>&nbsp;</span> */}
         {text}

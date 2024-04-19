@@ -7,7 +7,7 @@ import "./Board.css";
 export default function Board() {
   const [updateCount, setUpdateCount] = useState(0);
 
-  console.log("Board update count:", updateCount);
+  //console.log("Board update count:", updateCount);
 
   if (!Sudoku.currentGame) {
     setTimeout(Sudoku.createDefaultGame, 0);

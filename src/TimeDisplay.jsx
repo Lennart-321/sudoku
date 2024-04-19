@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Settings } from "./Settings";
 import { Sudoku } from "./Sudoku";
 import "./TimeDisplay.css";
+import { CalcBoard } from "./CalcBoard";
 
 export function TimeDisplay() {
   const [updateCount, setUpdateCount] = useState(0);
@@ -19,8 +20,15 @@ export function TimeDisplay() {
     if (!Sudoku.currentGame.isSolved) {
       setTimeout(() => setUpdateCount(c => c + 1), 1001 - (elapsed % 10) * 100);
     }
+    var levelInfo = CalcBoard.getLevel(Sudoku.currentGame.levelCount);
   }
 
   //console.log("TimeDisplay:", show, timeStr, Sudoku.currentGame?.isSolved, Sudoku.currentGame?.startTime);
-  return show ? <span id="time-display">{timeStr}</span> : <></>;
+  return show ? (
+    <span id="time-display">
+      Level {levelInfo} - {timeStr}
+    </span>
+  ) : (
+    <></>
+  );
 }

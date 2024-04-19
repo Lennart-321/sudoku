@@ -6,11 +6,12 @@ export class Game {
   board;
   targetBoard;
   targetStatus;
+  levelCount;
   startTime;
   solvedTime;
   isSolved;
 
-  constructor(brd, trg = null, trgStat = undefined) {
+  constructor(brd, trg = null, trgStat = undefined, levelCount = null) {
     // // prettier-ignore
     // this.board = brd ? brd : Calc.simpleCheatReduce([
     //   0xD00,0x1ff,0x1ff,0x1ff,0x1ff,0x1ff,0x1ff,0xC02,0xC80,
@@ -27,6 +28,7 @@ export class Game {
     //this.board = brd ? brd : CalcBoard.generateNewGame();
     this.targetBoard = trg;
     this.targetStatus = trgStat !== undefined ? trgStat : trg ? 1 : 0;
+    this.levelCount = levelCount;
     this.isSolved = false;
     this.startTime = Sudoku.now();
     this.solvedTime = null;
@@ -37,6 +39,7 @@ export class Game {
   solutionType() {
     return Calc.solutionType(this);
   }
+
   // isPlaying() {
   //   return !this.isSolved && !!this.startTime;
   // }

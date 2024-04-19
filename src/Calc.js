@@ -24,14 +24,14 @@ export class Calc {
       });
     }
 
-    //TODO: Calc.initClass() more...
+    //? //TODO: Calc.initClass() more...
 
-    console.log(
-      "Calc.initClass() #symbolvalues=",
-      nrValues,
-      Calc.bitCountArray_UsedBy_symbolCount.length,
-      Calc.bitCountArray_UsedBy_symbolCount[nrValues - 1]
-    );
+    // console.log(
+    //   "Calc.initClass() #symbolvalues=",
+    //   nrValues,
+    //   Calc.bitCountArray_UsedBy_symbolCount.length,
+    //   Calc.bitCountArray_UsedBy_symbolCount[nrValues - 1]
+    // );
   }
   //static showHelpsymolsBit = 0x200;
   static isFixedBit = 0x400;
@@ -318,6 +318,7 @@ export class Calc {
       true /*discard solved*/
     );
     game.targetStatus = calcBoard.solutionType();
+    game.levelCount = calcBoard.levelCount;
     if (!game.targetBoard) {
       game.targetBoard = calcBoard.targetBoard;
     }
@@ -645,7 +646,7 @@ export class Calc {
     const board = Array(Calc.nrSquares).fill(Calc.symbolBits);
     Calc.glbCounter = 0;
     const ok = Calc.solveRandom2(board, 0);
-    console.log("generateRandomBoard()=>", ok, board.length, board);
+    //console.log("generateRandomBoard()=>", ok, board.length, board);
     return board;
   }
 

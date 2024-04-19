@@ -152,7 +152,11 @@ export class Sudoku {
       0x1FF, 0xD00, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0xC08, 0x1FF, 0x1FF,
     ];
     Calc.twistAndTurn(hardBoard);
-    Sudoku.currentGame = new Game(hardBoard);
+    let cb = new CalcBoard(Calc.copyBoard(hardBoard));
+    let levelCount = [];
+    cb.trySolve(levelCount);
+
+    Sudoku.currentGame = new Game(hardBoard, cb.board, cb.targetStatus, levelCount);
     //TimeDisplay.jsx:9 Warning: Cannot update a component (`TimeDisplay`) while rendering a different component (`Board`). To locate the bad setState() call inside `Board`, follow the stack trace as described in https://reactjs.org/link/setstate-in-render
     //Sudoku.updateTimeDisplay();
     Sudoku.refreshApp && Sudoku.refreshApp();
@@ -164,7 +168,7 @@ export class Sudoku {
     //Normal new game
     if (level >= 0) {
       Sudoku.currentGame = CalcBoard.generateNewGame(level);
-      console.log("createNewGame autoReduceHelpSymbols =", Settings.autoReduceHelpSymbols);
+      //console.log("createNewGame autoReduceHelpSymbols =", Settings.autoReduceHelpSymbols);
       Sudoku.isDefineGameState = false;
       Sudoku.currentGameNumberStored = -1;
       Sudoku.updateMenu && Sudoku.updateMenu();
@@ -238,6 +242,7 @@ export class Sudoku {
   }
 
   static showSudokuInfo() {
+    //let l = Sudoku.currentGame.levelCount;
     Sudoku.importantMessage &&
       Sudoku.importantMessage(
         [
@@ -245,9 +250,10 @@ export class Sudoku {
           "Click on choosen symbol to delete.",
           "Use Ctrl + click to keep support symbol.",
           "Use Ctrl + click to focus on more than one symbol.",
+          //`${l[0]},${l[1]},${l[2]},${l[3]},${l[4]},${l[5]},${l[6]},${l[7]}`,
         ],
         "#333",
-        0
+        30
       );
   }
   //   static confirmCommand(message, command) {

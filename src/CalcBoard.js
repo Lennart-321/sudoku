@@ -8,6 +8,7 @@ export class CalcBoard {
   solvedN;
   targetBoard;
   targetStatus; //0=Unknown, 1=Some solution, 3=Unique solution, 5=Not unique solution, 8=Not solvable, -1=ERROR
+  levelCount;
 
   constructor(
     board,
@@ -24,6 +25,7 @@ export class CalcBoard {
     this.solvedIxs = solvedIxs;
     this.unsolvedIxs = unsolvedIxs;
     this.solvedN = null;
+    this.levelCount = null;
     if (!isWorkBord) {
       Calc.transformToWorkBoard(this.board, discardSolved);
     }
@@ -33,13 +35,13 @@ export class CalcBoard {
     return new CalcBoard(this.board, true, this.targetBoard, this.targetStatus);
   }
 
-  transformToGame() {
+  transformToGame(levelCount) {
     const gameBoard = Calc.copyBoard(this.board);
     gameBoard.forEach((sq, ix) => {
       if (Calc.symbolCount(sq) === 1) gameBoard[ix] |= Calc.isFixedBit | Calc.isDeterminedBit;
       else gameBoard[ix] = Calc.symbolBits;
     });
-    return new Game(gameBoard, this.targetBoard, this.targetStatus);
+    return new Game(gameBoard, this.targetBoard, this.targetStatus, levelCount);
   }
   updateGameBoard(game) {
     for (let ix = 0; ix < Calc.nrSquares; ix++) {
@@ -50,15 +52,20 @@ export class CalcBoard {
     }
   }
   removeManySolved(level) {
-    const levelCount = [];
+    //const levelCount = [];
+    let lastLevelCount = null;
+    let levelCount = null;
     if (level >= 10) {
-      while (this.removeRandomSolved(levelCount));
+      while (this.removeRandomSolved(/*levelCount*/)) {}
     } else {
-      while (this.removeRandomSolvedAtLevel(level, levelCount));
+      while ((levelCount = this.removeRandomSolvedAtLevel(level /*, levelCount*/))) {
+        lastLevelCount = levelCount;
+      }
     }
-    console.log("removeManySolved(" + level + ") level counter:", levelCount);
+    //console.log("removeManySolved(" + level + ") level counter:", lastLevelCount);
+    return lastLevelCount;
   }
-  removeRandomSolved(levelCountTot) {
+  removeRandomSolved(/*levelCountTot*/) {
     for (
       let removeOptions = this.solvedIxs.slice(), removeIxIx;
       removeOptions.length > 0;
@@ -73,14 +80,15 @@ export class CalcBoard {
       const tmpBoard = this.copy();
       tmpBoard.board[removeIx] &= ~correctSym; //Remove correct option
 
-      let levelCount = [];
-      if (!tmpBoard.isSolvable(levelCount)) {
-        if (levelCountTot.length === 0) levelCountTot.push(...levelCount);
-        else levelCount.forEach((l, lix) => (levelCountTot[lix] += l));
+      //let levelCount = [];
+      if (!tmpBoard.isSolvable([])) {
+        // if (levelCountTot.length === 0) levelCountTot.push(...levelCount);
+        // else levelCount.forEach((l, lix) => (levelCountTot[lix] += l));
 
         this.solvedIxs.splice(this.solvedIxs.indexOf(removeIx), 1);
         this.unsolvedIxs.push(removeIx);
         return true;
+        //return levelCount;
       }
 
       //Failed, could not be removed!
@@ -91,7 +99,7 @@ export class CalcBoard {
     return false;
   }
 
-  removeRandomSolvedAtLevel(maxLevel, levelCountTot) {
+  removeRandomSolvedAtLevel(maxLevel /*, levelCountTot*/) {
     for (
       let removeOptions = this.solvedIxs.slice(), removeIxIx;
       removeOptions.length > 0;
@@ -107,12 +115,13 @@ export class CalcBoard {
 
       let levelCount = [];
       if (tmpBoard.isSolvable(levelCount, maxLevel >= 10 ? 9 : maxLevel)) {
-        if (levelCountTot.length === 0) levelCountTot.push(...levelCount);
-        else levelCount.forEach((l, lix) => (levelCountTot[lix] += l));
+        // if (levelCountTot.length === 0) levelCountTot.push(...levelCount);
+        // else levelCount.forEach((l, lix) => (levelCountTot[lix] += l));
 
         this.solvedIxs.splice(this.solvedIxs.indexOf(removeIx), 1);
         this.unsolvedIxs.push(removeIx);
-        return true;
+        //return true;
+        return levelCount;
       }
 
       //Failed, could not be removed!
@@ -168,7 +177,7 @@ export class CalcBoard {
     let nrRedTotal = 0;
 
     while (this.continueSolving() && nrRedTaE !== 0) {
-      console.log("trySolve while", ++loopCount);
+      //console.log("trySolve while", ++loopCount);
 
       let nrRed = 0;
       nrRedTaE = -1;
@@ -214,8 +223,24 @@ export class CalcBoard {
 
     const solved = this.isSolved()
     //levelCount[levelCount.length-1] = 
-    console.log("trySolve()=>", solved, loopCount, nrRedTotal, levelCount, nrRedTaE);
+    // if (solved && levelCount[0] === 0) {
+    //   console.log("Level 0 === 0");  
+    // }
+    //console.log("trySolve()=>", solved, loopCount, nrRedTotal, levelCount, nrRedTaE);
     return solved;
+  }
+  static getLevel(levelCount) {
+    if (!Array.isArray(levelCount)) return 0;
+    if (levelCount.length === 0) return 0;
+    if (levelCount[levelCount.length - 1] > 0) {
+      return 9 + levelCount[levelCount.length - 1];
+    }
+    for (let lev = levelCount.length - 2; lev >= 0; lev--) {
+      if (levelCount[lev] > 0) {
+        return lev + 1;
+      }
+    }
+    return 0;
   }
 
   //Only 1 symbol in 1 square. Reduce that symbol from rest of group
@@ -412,9 +437,9 @@ export class CalcBoard {
       if ((symbol & doForSymbolsBits) === 0) continue;
       const sqIxs = Calc.squareIxsOfSymbol(this.board, gx, symbol);
       let nr = sqIxs.length;
-      if (nr === 1) {
-        console.log("ERROR!? reduceOtherGroups: Symbol in only one square");
-      }
+      // if (nr === 1) {
+      //   console.log("ERROR!? reduceOtherGroups: Symbol in only one square");
+      // }
       if (1 < nr && nr <= Calc.nrSymbolRoot) {
         let otherGrp = -1;
         if (Math.floor(sqIxs[0] / Calc.nrSymbolRoot) == Math.floor(sqIxs[nr - 1] / Calc.nrSymbolRoot)) {
@@ -468,9 +493,11 @@ export class CalcBoard {
       let tmpBoard = this.copy();
       tmpBoard.solvedN = Calc.deepCopy(this.solvedN);
       tmpBoard.board[taeSqIx] = taeSym;
-      if (tmpBoard.trySolve(levelCount)) {
+      let tmpLevelCount = [];
+      if (tmpBoard.trySolve(tmpLevelCount)) {
         this.board = tmpBoard.board;
         this.solvedN = tmpBoard.solvedN;
+        tmpLevelCount.forEach((c, l) => (levelCount[l] += c));
         return 1;
       }
     }
@@ -484,18 +511,19 @@ export class CalcBoard {
       return this.targetStatus;
     }
 
+    this.levelCount = [];
     let tmpBoard = this.copy();
-    if (tmpBoard.trySolve([], 9)) {
+    if (tmpBoard.trySolve(this.levelCount, 9)) {
       return (this.targetStatus = 3);
     }
 
     if (this.targetStatus === 0) {
-      const levelCount = [];
-      if (!tmpBoard.trySolve(levelCount)) {
+      this.levelCount = [];
+      if (!tmpBoard.trySolve(this.levelCount)) {
         return (this.targetStatus = 8);
       }
       this.targetBoard = tmpBoard.board;
-      if (levelCount[7] === 0) {
+      if (this.levelCount[7] === 0) {
         console.log("solutionType ERROR: levelCount[7] === 0");
         return (this.targetStatus = 3);
       }
@@ -544,7 +572,7 @@ export class CalcBoard {
     do {
       if (n > Calc.nrSymbols) return [[], 0];
       nSymSquares = Calc.getNSymbolSquares(this.board, n++);
-      console.log("prepareTrialAndError", n, nSymSquares, this.board);
+      //console.log("prepareTrialAndError", n, nSymSquares, this.board);
     } while (nSymSquares.length === 0);
 
     const taeSqIx = nSymSquares[Math.floor(Math.random() * nSymSquares.length)];
@@ -564,8 +592,12 @@ export class CalcBoard {
     for (var i = 0; i < solvedIxs.length; i++) solvedIxs[i] = i;
 
     const cb = new CalcBoard(board, true, targetBoard, 3 /*Unique solution*/, solvedIxs, []);
-    cb.removeManySolved(level);
+    let levelCount = cb.removeManySolved(level);
+    if (levelCount === null) {
+      levelCount = [];
+      cb.copy().trySolve(levelCount);
+    }
 
-    return cb.transformToGame();
+    return cb.transformToGame(levelCount);
   }
 }
