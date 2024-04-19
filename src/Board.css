@@ -1,6 +1,13 @@
 #board {
-  width: var(--boardSz);
-  height: var(--boardSz);
+  --csz0: var(--cellSz);
+  --csz1: calc(var(--cellSz) + var(--lineSz));
+  --cszB: calc(var(--cellSz) + var(--bigLineSz));
+
+  width: calc(6 * var(--csz1) + 2 * var(--cszB) + var(--csz0));
+  height: calc(6 * var(--csz1) + 2 * var(--cszB) + var(--csz0));
+
+  /* width: var(--boardSz);
+  height: var(--boardSz); */
 
   display: grid;
   /* grid-template-columns: repeat(9, 1fr);
@@ -10,17 +17,24 @@
   grid-template-rows: 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr 3fr 24fr 1fr 24fr 1fr 24fr; */
 
   /*prettier-ignore*/
-  grid-template-columns: var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+  /* grid-template-columns: var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
-   var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz);
+   var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz); */
   /*prettier-ignore*/
-  grid-template-rows:    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
+  /* grid-template-rows:    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
     var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz) var(--bigLineSz)
-    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz);
+    var(--cellSz) var(--lineSz) var(--cellSz) var(--lineSz) var(--cellSz); */
+
+  grid-template-columns: var(--csz1) var(--csz1) var(--cszB) var(--csz1) var(--csz1) var(--cszB) var(--csz1) var(--csz1) var(
+      --csz0
+    );
+  grid-template-rows: var(--csz1) var(--csz1) var(--cszB) var(--csz1) var(--csz1) var(--cszB) var(--csz1) var(--csz1) var(
+      --csz0
+    );
 
   /* background-color: rgba(0, 0, 0, 0.5); */
-  background-color: gray;
-  border: var(--boardBorder) gray solid;
+  background-color: var(--cell-backgroud);
+  border: var(--boardBorder) var(--boardBkg) solid;
   border-radius: 0.2rem;
   margin: 0;
   padding: 0;

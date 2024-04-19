@@ -10,11 +10,13 @@ body {
   --fontSize: 10px;
   --fontFamily: Verdana, "Segoe UI", Tahoma, Geneva, sans-serif;
 
-  --lineSz: 0.14rem;
-  --bigLineSz: 0.35em;
+  /* --lineSz: 0.14rem; */
+  --lineSz: 1px;
+  --bigLineSz: 0.4rem;
   --cellSz: 6rem;
   --boardSz: calc(9 * var(--cellSz) + 2 * var(--bigLineSz) + 6 * var(--lineSz));
   --boardBorder: calc(1.2 * var(--bigLineSz));
+  --boardBkg: gray;
 
   /* tot cell mrg = 6*bigmrg + 12*smlmrg  */
   --bigmrg: 0.2rem;
