@@ -6,7 +6,7 @@
   font-size: 4rem;
   text-align: center;
   line-height: var(--cellSz);
-  border-radius: 0.2rem;
+  /* border-radius: 0.2rem; */
   user-select: none;
   background-color: var(--cell-backgroud);
 }

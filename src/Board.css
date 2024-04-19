@@ -9,7 +9,7 @@
   /* background-color: rgba(0, 0, 0, 0.5); */
   background-color: gray;
   border: var(--boardBorder) gray solid;
-  border-radius: 0.3rem;
+  border-radius: 0.1rem;
   margin: 0;
   padding: 0;
 }

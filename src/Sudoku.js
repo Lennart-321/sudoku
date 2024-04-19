@@ -112,7 +112,7 @@ export class Sudoku {
     if (solved && !Sudoku.currentGame.isSolved) {
       Sudoku.currentGame.isSolved = true;
       Sudoku.currentGame.solvedTime = Sudoku.now();
-      let duration = Math.floor((Sudoku.currentGame.solvedTime - Sudoku.currentGame.startTime) / 1000);
+      let duration = Math.floor((Sudoku.currentGame.solvedTime - Sudoku.currentGame.startTime) / 10);
 
       Sudoku.importantMessage &&
         Sudoku.importantMessage(["Solved!", "Time: " + Sudoku.formatDuration(duration, true)], "#0A0", 4);
