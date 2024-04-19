@@ -167,6 +167,7 @@ export class Sudoku {
       console.log("createNewGame autoReduceHelpSymbols =", Settings.autoReduceHelpSymbols);
       Sudoku.isDefineGameState = false;
       Sudoku.currentGameNumberStored = -1;
+      Sudoku.updateMenu && Sudoku.updateMenu();
     }
     //Restart game
     else if (level === -2) {
@@ -209,6 +210,7 @@ export class Sudoku {
       Sudoku.isDefineGameState = true;
       needInitialReduce = false;
       Sudoku.currentGameNumberStored = -1;
+      Sudoku.updateMenu && Sudoku.updateMenu();
     }
 
     if (needInitialReduce) {
@@ -253,10 +255,10 @@ export class Sudoku {
   //   }
 
   static canLoadPre() {
-    return false && Sudoku.currentGameNumberStored !== 0 && Sudoku.getHighGameNumber() > 0;
+    return Sudoku.currentGameNumberStored !== 0 && Sudoku.getHighGameNumber() > 0;
   }
   static canLoadNx() {
-    return false && 0 <= Sudoku.currentGameNumberStored && Sudoku.currentGameNumberStored < Sudoku.getHighGameNumber();
+    return 0 <= Sudoku.currentGameNumberStored && Sudoku.currentGameNumberStored < Sudoku.getHighGameNumber();
   }
 
   static loadPreviousGame() {
@@ -295,7 +297,7 @@ export class Sudoku {
   }
 
   static saveGame() {
-    return;
+    //return;
     if (Sudoku.currentGameNumberStored < 0) {
       Sudoku.getHighGameNumber();
       Sudoku.currentGameNumberStored = ++Sudoku.highGameNumberStored;
@@ -305,7 +307,7 @@ export class Sudoku {
     localStorage.setItem(Sudoku.currentGameNumberStored.toString(), gameJson);
   }
   static loadGame() {
-    return false;
+    //return false;
     if (Sudoku.currentGameNumberStored < 0) {
       Sudoku.getHighGameNumber();
       Sudoku.currentGameNumberStored = Sudoku.highGameNumberStored;
